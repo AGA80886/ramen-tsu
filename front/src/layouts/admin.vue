@@ -176,7 +176,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import logo from '../assets/images/logo.png'
+import logo from '@/assets/images/logo.png'
 
 import {
   ArrowDown,
@@ -190,7 +190,7 @@ import {
   UserFilled,
 } from '@element-plus/icons-vue'
 
-import DarkModeToggle from '@/components/layout/frontend/DarkModeToggle.vue'
+import DarkModeToggle from '@/components/common/DarkModeToggle.vue'
 import { useUserStore } from '@/stores/user'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useLogoutMutation } from '@/queries/auth'
@@ -235,10 +235,14 @@ async function logout() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .admin-layout {
   min-height: 100vh;
-  background-color: var(--el-bg-color-page);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  transition:
+    color var(--transition-normal),
+    background-color var(--transition-normal);
 }
 
 /* Aside */
@@ -282,8 +286,8 @@ async function logout() {
   justify-content: space-between;
   height: 64px;
   padding: 0 24px;
-  background-color: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-light);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header-left,
@@ -302,14 +306,14 @@ async function logout() {
 
 .page-title h1 {
   margin: 0;
-  color: var(--el-text-color-primary);
+  color: var(--color-text);
   font-size: 18px;
 }
 
 .page-title span {
   display: block;
   margin-top: 3px;
-  color: var(--el-text-color-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 
@@ -321,13 +325,13 @@ async function logout() {
 
 .admin-toolbar {
   padding: 16px 24px;
-  background-color: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-lighter);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .admin-main {
   padding: 24px;
-  background-color: var(--el-bg-color-page);
+  background-color: var(--color-background);
 }
 
 /* 平板與手機 */

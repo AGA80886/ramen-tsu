@@ -1,26 +1,72 @@
 <template>
   <div class="page-container">
-    <el-row :gutter="16" class="filters">
-      <el-col :xs="24" :md="12">
-        <el-input v-model="search.text" clearable placeholder="搜尋商品">
-          <template #prefix><el-icon><Search /></el-icon></template>
+    <el-row
+      :gutter="16"
+      class="filters"
+    >
+      <el-col
+        :xs="24"
+        :md="12"
+      >
+        <el-input
+          v-model="search.text"
+          clearable
+          placeholder="搜尋商品"
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
         </el-input>
       </el-col>
-      <el-col :xs="24" :md="12">
-        <el-select v-model="search.sort" value-key="text" placeholder="排序方式" style="width: 100%">
-          <el-option v-for="option in sortOptions" :key="option.text" :label="option.text" :value="option" />
+      <el-col
+        :xs="24"
+        :md="12"
+      >
+        <el-select
+          v-model="search.sort"
+          value-key="text"
+          placeholder="排序方式"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="option in sortOptions"
+            :key="option.text"
+            :label="option.text"
+            :value="option"
+          />
         </el-select>
       </el-col>
       <el-col :span="24">
-        <el-checkbox-group v-model="search.categories" class="category-group">
-          <el-checkbox-button v-for="option in categoryOptions" :key="option" :label="option" :value="option" />
+        <el-checkbox-group
+          v-model="search.categories"
+          class="category-group"
+        >
+          <el-checkbox-button
+            v-for="option in categoryOptions"
+            :key="option"
+            :label="option"
+            :value="option"
+          />
         </el-checkbox-group>
       </el-col>
     </el-row>
 
-    <el-empty v-if="pagedProducts.length === 0" description="沒有符合條件的商品" />
-    <el-row v-else :gutter="20">
-      <el-col v-for="item in pagedProducts" :key="item._id" :xs="24" :sm="12" :lg="6" class="product-col">
+    <el-empty
+      v-if="pagedProducts.length === 0"
+      description="沒有符合條件的商品"
+    />
+    <el-row
+      v-else
+      :gutter="20"
+    >
+      <el-col
+        v-for="item in pagedProducts"
+        :key="item._id"
+        :xs="24"
+        :sm="12"
+        :lg="6"
+        class="product-col"
+      >
         <ProductCard v-bind="item" />
       </el-col>
     </el-row>
@@ -85,5 +131,5 @@ watch(search, () => { page.value = 1 }, { deep: true })
 
 <route lang="yaml">
 meta:
-  title: 購物網站
+  title: 首頁
 </route>
