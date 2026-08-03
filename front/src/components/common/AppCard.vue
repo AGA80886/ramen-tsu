@@ -32,8 +32,8 @@
 </template>
 
 <script setup lang="ts">
-import type { CSSProperties } from 'vue'
 import type { CardProps } from 'element-plus'
+import type { CSSProperties } from 'vue'
 
 interface Props {
   title?: string
@@ -50,7 +50,6 @@ withDefaults(defineProps<Props>(), {
 
 <style scoped lang="scss">
 .app-card {
-  height: 100%;
   overflow: hidden;
   background-color: var(--color-surface);
   border-color: var(--color-border);
@@ -59,10 +58,6 @@ withDefaults(defineProps<Props>(), {
     background-color var(--transition-normal),
     border-color var(--transition-normal),
     box-shadow var(--transition-fast);
-
-  &:hover {
-    box-shadow: var(--shadow-sm);
-  }
 
   &__header {
     display: flex;
