@@ -1,7 +1,8 @@
 import type { Router } from 'vue-router'
 import { START_LOCATION } from 'vue-router'
 
-import { useRefreshMutation } from '@/queries/auth'
+import { pinia } from '@/plugins/pinia'
+import * as authService from '@/services/auth'
 import { useUserStore } from '@/stores/user'
 import type { UserRole } from '@/types/auth'
 
@@ -21,34 +22,39 @@ function hasRequiredRole(
 export function setupRouterGuards(router: Router): void {
   router.beforeEach(async (to, from) => {
     /**
-     * 第一次進入網站時，嘗試透過 Refresh Token
-     * 恢復使用者的登入狀態。
+     * 在 Vue 元件外使用 Pinia Store 時，
+     * 明確傳入 pinia instance。
      */
-    if (
-      from === START_LOCATION &&
-      !isAuthInitialized
-    ) {
+    const user = useUserStore(pinia)
+
+    /**
+     * 第一次進入網站時，直接呼叫 Auth Service，
+     * 嘗試透過 Refresh Token 恢復登入狀態。
+     *
+     * Router Guard 不屬於元件 setup 或 effect scope，
+     * 因此不在這裡呼叫 Pinia Colada mutation composable。
+     */
+    if (from === START_LOCATION && !isAuthInitialized) {
       isAuthInitialized = true
 
       try {
-        await useRefreshMutation().mutateAsync()
+        const response = await authService.refresh()
+
+        if (response.data?.result) {
+          user.login(response.data.result)
+        }
       } catch {
         // 沒有有效登入狀態時，不阻止導航。
         // 後續交由 access 與 roles 規則處理。
       }
     }
 
-    const user = useUserStore()
-
     /**
      * 訪客限定頁面。
      *
      * 已登入使用者不可再次進入登入、註冊等頁面。
      */
-    if (
-      to.meta.access === 'guest' &&
-      user.isLoggedIn
-    ) {
+    if (to.meta.access === 'guest' && user.isLoggedIn) {
       return {
         path: '/',
       }
@@ -62,10 +68,7 @@ export function setupRouterGuards(router: Router): void {
       to.meta.access === 'authenticated' ||
       Boolean(to.meta.roles?.length)
 
-    if (
-      requiresAuthentication &&
-      !user.isLoggedIn
-    ) {
+    if (requiresAuthentication && !user.isLoggedIn) {
       return {
         path: '/login',
         query: {
@@ -79,12 +82,7 @@ export function setupRouterGuards(router: Router): void {
      *
      * 使用者角色必須存在於路由允許的 roles 中。
      */
-    if (
-      !hasRequiredRole(
-        to.meta.roles,
-        user.role,
-      )
-    ) {
+    if (!hasRequiredRole(to.meta.roles, user.role)) {
       return {
         path: '/forbidden',
       }

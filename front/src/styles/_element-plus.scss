@@ -1,0 +1,40 @@
+:root {
+  --el-color-primary: var(--color-primary);
+  --el-color-primary-light-3: #a9744f;
+  --el-color-primary-light-5: #c5a289;
+  --el-color-primary-light-7: #dfcbbc;
+  --el-color-primary-light-8: #eadbd0;
+  --el-color-primary-light-9: #f4ede8;
+  --el-color-primary-dark-2: #70370f;
+  --el-color-success: var(--color-success);
+  --el-color-warning: var(--color-warning);
+  --el-color-danger: var(--color-danger);
+  --el-color-info: var(--color-info);
+
+  --el-bg-color: var(--color-background);
+  --el-bg-color-page: var(--color-background);
+  --el-bg-color-overlay: var(--color-surface);
+
+  --el-fill-color-blank: var(--color-surface);
+  --el-fill-color-light: var(--color-background);
+  --el-fill-color-lighter: var(--color-background);
+  --el-fill-color-extra-light: var(--color-background);
+
+  --el-text-color-primary: var(--color-text);
+  --el-text-color-regular: var(--color-text-secondary);
+  --el-text-color-secondary: var(--color-text-secondary);
+  --el-text-color-placeholder: var(--color-text-secondary);
+
+  --el-border-color: var(--color-border);
+  --el-border-color-light: var(--color-border);
+  --el-border-color-lighter: var(--color-border);
+  --el-border-color-extra-light: var(--color-border);
+
+    /* Radius */
+  --el-border-radius-small: var(--radius-sm);
+  --el-border-radius-base: var(--radius-md);
+  --el-border-radius-round: var(--radius-round);
+  --el-border-radius-circle: 50%;
+
+  --el-mask-color: rgb(0 0 0 / 50%);
+}

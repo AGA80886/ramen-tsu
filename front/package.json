@@ -20,6 +20,7 @@
     "@pinia/colada": "^1.3.1",
     "@vueuse/core": "^14.3.0",
     "axios": "^1.18.1",
+    "bootstrap": "^5.3.8",
     "element-plus": "^2.14.3",
     "pinia": "^3.0.4",
     "validator": "^13.15.35",

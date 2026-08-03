@@ -1,0 +1,17 @@
+@use './variables' as variables;
+
+$primary: variables.$color-primary;
+$secondary: variables.$color-secondary;
+$success: variables.$color-success;
+$warning: variables.$color-warning;
+$danger: variables.$color-danger;
+$info: variables.$color-info;
+
+$body-bg: variables.$color-background-light;
+$body-color: variables.$color-text-light;
+
+$border-radius: 0.75rem;
+$border-radius-sm: 0.5rem;
+$border-radius-lg: 1rem;
+
+@import 'bootstrap/scss/bootstrap';

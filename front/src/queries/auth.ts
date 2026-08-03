@@ -22,12 +22,6 @@ export const useLoginMutation = defineMutation(() => {
   })
 })
 
-export const useRefreshMutation = defineMutation(() =>
-  useMutation({
-    mutation: () => auth.refresh(),
-  }),
-)
-
 export const useLogoutMutation = defineMutation(() => {
   const user = useUserStore()
 

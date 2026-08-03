@@ -1,0 +1,63 @@
+@use './variables' as variables;
+
+:root {
+  color-scheme: light;
+
+  // 品牌色
+  --color-primary: #{variables.$color-primary};
+  --color-primary-soft: #f4ede8;
+  --color-secondary: #{variables.$color-secondary};
+
+  // 狀態色
+  --color-success: #{variables.$color-success};
+  --color-warning: #{variables.$color-warning};
+  --color-danger: #{variables.$color-danger};
+  --color-info: #{variables.$color-info};
+
+  // 畫面基礎色
+  --color-background: #{variables.$color-background-light};
+  --color-surface: #{variables.$color-surface-light};
+  --color-text: #{variables.$color-text-light};
+  --color-text-secondary: #{variables.$color-text-secondary-light};
+  --color-border: #{variables.$color-border-light};
+
+  // 常用元件色
+  --color-link: #{variables.$color-primary};
+  --color-heading: #{variables.$color-primary};
+
+    /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-round: 9999px;
+
+    /* Shadow */
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 10%);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 15%);
+
+  /* Transition */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+html.dark {
+  color-scheme: dark;
+
+  --color-primary: #{variables.$color-primary};
+  --color-primary-soft: rgb(139 69 19 / 25%);
+  --color-secondary: #{variables.$color-secondary};
+
+  --color-success: #{variables.$color-success};
+  --color-warning: #{variables.$color-warning};
+  --color-danger: #{variables.$color-danger};
+  --color-info: #{variables.$color-info};
+
+  --color-background: #{variables.$color-background-dark};
+  --color-surface: #{variables.$color-surface-dark};
+  --color-text: #{variables.$color-text-dark};
+  --color-text-secondary: #{variables.$color-text-secondary-dark};
+  --color-border: #{variables.$color-border-dark};
+
+  --color-link: #d8a06f;
+  --color-heading: #d8a06f;
+}
