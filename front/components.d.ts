@@ -11,8 +11,15 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppButton: typeof import('./src/components/common/AppButton.vue')['default']
+    AppCard: typeof import('./src/components/common/AppCard.vue')['default']
     AppConfigProvider: typeof import('./src/components/providers/AppConfigProvider.vue')['default']
+    AppDialog: typeof import('./src/components/common/AppDialog.vue')['default']
+    AppEmpty: typeof import('./src/components/common/AppEmpty.vue')['default']
+    AppLoading: typeof import('./src/components/common/AppLoading.vue')['default']
+    AppPagination: typeof import('./src/components/common/AppPagination.vue')['default']
     DarkModeToggle: typeof import('./src/components/common/DarkModeToggle.vue')['default']
+    ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElBadge: typeof import('element-plus/es')['ElBadge']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
