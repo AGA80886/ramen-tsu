@@ -1,3 +1,4 @@
+// useDark.ts
 import { useDark, useToggle } from '@vueuse/core'
 
 const isDark = useDark({
@@ -6,7 +7,7 @@ const isDark = useDark({
 
 const toggleDark = useToggle(isDark)
 
-export function useTheme() {
+export function useDarkMode() {
   return {
     isDark,
     toggleDark,

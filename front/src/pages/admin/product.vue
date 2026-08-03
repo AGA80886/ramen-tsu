@@ -2,48 +2,169 @@
   <div class="admin-product-page">
     <div class="page-header">
       <h1>商品管理</h1>
-      <el-button type="primary" @click="openDialog(null)">
+      <el-button
+        type="primary"
+        @click="openDialog(null)"
+      >
         <el-icon><Plus /></el-icon>
         新增商品
       </el-button>
     </div>
 
-    <el-input v-model="search" class="search-input" clearable placeholder="搜尋商品" :prefix-icon="Search" />
+    <el-input
+      v-model="search"
+      class="search-input"
+      clearable
+      placeholder="搜尋商品"
+      :prefix-icon="Search"
+    />
 
-    <el-table v-loading="isLoading" :data="filteredProducts" stripe>
-      <el-table-column prop="_id" label="ID" min-width="220" />
-      <el-table-column label="圖片" width="90">
-        <template #default="{ row }"><el-image class="table-image" fit="cover" :src="row.imageUrl" /></template>
+    <el-table
+      v-loading="isLoading"
+      :data="filteredProducts"
+      stripe
+    >
+      <el-table-column
+        prop="_id"
+        label="ID"
+        min-width="220"
+      />
+      <el-table-column
+        label="圖片"
+        width="90"
+      >
+        <template #default="{ row }">
+          <el-image
+            class="table-image"
+            fit="cover"
+            :src="row.imageUrl"
+          />
+        </template>
       </el-table-column>
-      <el-table-column prop="name" label="名稱" min-width="140" sortable />
-      <el-table-column prop="price" label="價格" width="110" sortable />
-      <el-table-column prop="category" label="分類" width="90" />
-      <el-table-column prop="description" label="說明" min-width="220" show-overflow-tooltip />
-      <el-table-column label="上架" width="80">
-        <template #default="{ row }"><el-icon v-if="row.sell"><Check /></el-icon><el-icon v-else><Close /></el-icon></template>
+      <el-table-column
+        prop="name"
+        label="名稱"
+        min-width="140"
+        sortable
+      />
+      <el-table-column
+        prop="price"
+        label="價格"
+        width="110"
+        sortable
+      />
+      <el-table-column
+        prop="category"
+        label="分類"
+        width="90"
+      />
+      <el-table-column
+        prop="description"
+        label="說明"
+        min-width="220"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        label="上架"
+        width="80"
+      >
+        <template #default="{ row }">
+          <el-icon v-if="row.sell">
+            <Check />
+          </el-icon><el-icon v-else>
+            <Close />
+          </el-icon>
+        </template>
       </el-table-column>
-      <el-table-column label="建立日期" min-width="180">
-        <template #default="{ row }">{{ formatDate(row.createdAt) }}</template>
+      <el-table-column
+        label="建立日期"
+        min-width="180"
+      >
+        <template #default="{ row }">
+          {{ formatDate(row.createdAt) }}
+        </template>
       </el-table-column>
-      <el-table-column label="修改日期" min-width="180">
-        <template #default="{ row }">{{ formatDate(row.updatedAt) }}</template>
+      <el-table-column
+        label="修改日期"
+        min-width="180"
+      >
+        <template #default="{ row }">
+          {{ formatDate(row.updatedAt) }}
+        </template>
       </el-table-column>
-      <el-table-column label="操作" fixed="right" width="90">
-        <template #default="{ row }"><el-button circle :icon="Edit" @click="openDialog(row)" /></template>
+      <el-table-column
+        label="操作"
+        fixed="right"
+        width="90"
+      >
+        <template #default="{ row }">
+          <el-button
+            circle
+            :icon="Edit"
+            @click="openDialog(row)"
+          />
+        </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialog.open" :title="dialog.id ? '編輯商品' : '新增商品'" width="min(600px, 92vw)" :close-on-click-modal="false">
-      <el-form label-position="top" :disabled="isSubmitting" @submit.prevent="submit">
-        <el-form-item label="名稱" :error="errors.name"><el-input v-model="name" /></el-form-item>
-        <el-form-item label="價格" :error="errors.price"><el-input-number v-model="price" :min="0" style="width: 100%" /></el-form-item>
-        <el-form-item label="說明" :error="errors.description"><el-input v-model="description" type="textarea" :rows="5" /></el-form-item>
-        <el-form-item label="分類" :error="errors.category">
-          <el-select v-model="category" style="width: 100%">
-            <el-option v-for="option in categoryOptions" :key="option" :label="option" :value="option" />
+    <el-dialog
+      v-model="dialog.open"
+      :title="dialog.id ? '編輯商品' : '新增商品'"
+      width="min(600px, 92vw)"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        label-position="top"
+        :disabled="isSubmitting"
+        @submit.prevent="submit"
+      >
+        <el-form-item
+          label="名稱"
+          :error="errors.name"
+        >
+          <el-input v-model="name" />
+        </el-form-item>
+        <el-form-item
+          label="價格"
+          :error="errors.price"
+        >
+          <el-input-number
+            v-model="price"
+            :min="0"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item
+          label="說明"
+          :error="errors.description"
+        >
+          <el-input
+            v-model="description"
+            type="textarea"
+            :rows="5"
+          />
+        </el-form-item>
+        <el-form-item
+          label="分類"
+          :error="errors.category"
+        >
+          <el-select
+            v-model="category"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="option in categoryOptions"
+              :key="option"
+              :label="option"
+              :value="option"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item :error="errors.sell"><el-checkbox v-model="sell">上架</el-checkbox></el-form-item>
+        <el-form-item :error="errors.sell">
+          <el-checkbox v-model="sell">
+            上架
+          </el-checkbox>
+        </el-form-item>
         <el-form-item label="商品圖片">
           <vue-file-agent
             ref="fileAgent"
@@ -59,8 +180,19 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button :disabled="isSubmitting" @click="closeDialog">取消</el-button>
-        <el-button type="primary" :loading="isSubmitting" @click="submit">送出</el-button>
+        <el-button
+          :disabled="isSubmitting"
+          @click="closeDialog"
+        >
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="isSubmitting"
+          @click="submit"
+        >
+          送出
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -75,7 +207,16 @@ import * as yup from 'yup'
 import { useCreateMutation, useGetAllQuery, useUpdateMutation } from '@/queries/product'
 import { useSnackbarStore } from '@/stores/snackbar'
 
-const fileAgent = useTemplateRef<any>('fileAgent')
+interface FileAgentInstance {
+  deleteFileRecord?: () => void
+}
+
+interface FileRecord {
+  file?: File
+  error?: unknown
+}
+
+const fileAgent = useTemplateRef<FileAgentInstance>('fileAgent')
 const snackbar = useSnackbarStore()
 const { data: products, isLoading } = useGetAllQuery()
 const search = ref('')
@@ -104,8 +245,8 @@ const [price] = defineField('price')
 const [description] = defineField('description')
 const [category] = defineField('category')
 const [sell] = defineField('sell')
-const fileRecords = ref<any[]>([])
-const rawFileRecords = ref<any[]>([])
+const fileRecords = ref<FileRecord[]>([])
+const rawFileRecords = ref<File[]>([])
 
 function formatDate (value: string) { return new Date(value).toLocaleString('zh-TW') }
 function openDialog (item: IProduct | null) {

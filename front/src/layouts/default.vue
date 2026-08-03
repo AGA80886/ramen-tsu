@@ -314,7 +314,7 @@ import {
   UserFilled,
 } from '@element-plus/icons-vue'
 
-import DarkModeToggle from '@/components/layout/frontend/DarkModeToggle.vue'
+
 import { useLogoutMutation } from '@/queries/auth'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useUserStore } from '@/stores/user'
@@ -380,14 +380,15 @@ async function handleMobileCommand(command: string | number | object) {
 }
 </script>
 
-<style scoped>
+
+<style scoped lang="scss">
 .site-layout {
   min-height: 100vh;
-  background-color: var(--el-bg-color);
-  color: var(--el-text-color-primary);
+  background-color: var(--color-background);
+  color: var(--color-text);
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+    background-color var(--transition-normal),
+    color var(--transition-normal);
 }
 
 /* Header */
@@ -398,8 +399,8 @@ async function handleMobileCommand(command: string | number | object) {
   top: 0;
   height: 100px;
   padding: 0;
-  background-color: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-light);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header-inner {
@@ -442,7 +443,7 @@ async function handleMobileCommand(command: string | number | object) {
 
 .brand-text span {
   margin-top: 4px;
-  color: var(--el-text-color-secondary);
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -480,7 +481,7 @@ async function handleMobileCommand(command: string | number | object) {
   gap: 6px;
   max-width: 180px;
   padding: 8px 10px;
-  color: var(--el-text-color-regular);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -512,8 +513,8 @@ async function handleMobileCommand(command: string | number | object) {
   top: 100px;
   height: calc(100vh - 100px);
   overflow-y: auto;
-  background-color: var(--el-bg-color);
-  border-right: 1px solid var(--el-border-color-light);
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
 }
 
 .sidebar-menu {
@@ -525,13 +526,14 @@ async function handleMobileCommand(command: string | number | object) {
 
 .sidebar-menu :deep(.el-menu-item) {
   margin: 4px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 }
 
 .site-main {
   min-width: 0;
   padding: 24px;
   box-sizing: border-box;
+  background-color: var(--color-background);
 }
 
 /* 平板與手機 */
