@@ -5,7 +5,10 @@
       title="403 權限不足"
     >
       <template #extra>
-        <el-button type="primary" @click="router.replace('/')">
+        <el-button
+          type="primary"
+          @click="router.replace('/')"
+        >
           返回首頁
         </el-button>
       </template>

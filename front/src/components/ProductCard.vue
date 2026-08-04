@@ -1,15 +1,36 @@
 <template>
-  <el-card class="product-card" shadow="hover">
-    <el-image class="product-image" fit="cover" :src="imageUrl" />
+  <el-card
+    class="product-card"
+    shadow="hover"
+  >
+    <el-image
+      class="product-image"
+      fit="cover"
+      :src="imageUrl"
+    />
 
     <template #header>
-      <router-link class="product-title" :to="`/product/${_id}`">{{ name }}</router-link>
+      <router-link
+        class="product-title"
+        :to="`/product/${_id}`"
+      >
+        {{ name }}
+      </router-link>
     </template>
 
-    <div class="product-meta">{{ category }}／{{ formattedPrice }}</div>
-    <p class="product-description">{{ description }}</p>
+    <div class="product-meta">
+      {{ category }}／{{ formattedPrice }}
+    </div>
+    <p class="product-description">
+      {{ description }}
+    </p>
 
-    <el-button class="add-cart-button" type="primary" plain @click="addCart">
+    <el-button
+      class="add-cart-button"
+      type="primary"
+      plain
+      @click="addCart"
+    >
       <el-icon><ShoppingCart /></el-icon>
       加入購物車
     </el-button>
@@ -21,7 +42,7 @@ import type { IProduct } from '@/types/product'
 import { ShoppingCart } from '@element-plus/icons-vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAddCartMutation } from '@/queries/user'
+import { useAddCartItemMutation } from '@/queries/cart'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useUserStore } from '@/stores/user'
 
@@ -29,6 +50,7 @@ const props = defineProps<IProduct>()
 const user = useUserStore()
 const router = useRouter()
 const snackbar = useSnackbarStore()
+const addCartItemMutation = useAddCartItemMutation()
 
 const formattedPrice = computed(() =>
   new Intl.NumberFormat('zh-TW', {
@@ -44,7 +66,13 @@ async function addCart () {
       await router.push('/login')
       return
     }
-    await useAddCartMutation().mutateAsync({ product: props._id, quantity: 1, replace: false })
+
+
+    await addCartItemMutation.mutateAsync({
+  product: props._id,
+  quantity: 1,
+  replace: false,
+})
     snackbar.add({ text: '加入購物車成功', color: 'green' })
   } catch (error) {
     snackbar.addError(error)

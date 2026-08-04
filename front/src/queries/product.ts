@@ -1,77 +1,114 @@
 import type { ProductForm } from '@/types/product'
-import { defineMutation, defineQuery, useMutation, useQuery, useQueryCache } from '@pinia/colada'
-import { useRoute } from 'vue-router'
-import * as product from '@/services/product'
 
-// 快取保留時間 5 分鐘
+import {
+  defineMutation,
+  defineQuery,
+  useMutation,
+  useQuery,
+  useQueryCache,
+} from '@pinia/colada'
+import { useRoute } from 'vue-router'
+
+import * as productService from '@/services/product'
+
 const STALE_TIME = 1000 * 60 * 5
 
-export const useGetQuery = defineQuery(() => {
+export const useProductsQuery = defineQuery(() => {
   return useQuery({
-    // key 定義快取資料名稱
     key: ['product', 'public'],
-    // 查詢方式
+
     query: async () => {
-      const { data } = await product.get()
+      const { data } = await productService.getProducts()
+
       return data.result
     },
-    // 快取保留時間
+
     staleTime: STALE_TIME,
   })
 })
 
-export const useGetAllQuery = defineQuery(() => {
+export const useAdminProductsQuery = defineQuery(() => {
   return useQuery({
-    // key 定義快取資料名稱
-    key: ['product', 'all'],
-    // 查詢方式
+    key: ['product', 'admin'],
+
     query: async () => {
-      const { data } = await product.getAll()
+      const { data } =
+        await productService.getAdminProducts()
+
       return data.result
     },
-    // 快取保留時間
+
     staleTime: STALE_TIME,
   })
 })
 
-export const useGetIdQuery = defineQuery(() => {
+export const useProductByIdQuery = defineQuery(() => {
   const route = useRoute('/product/[id]')
+
   return useQuery({
-    // key 定義快取資料名稱
-    // 寫成 function 動態偵測 id 變更時更新資料
-    key: () => ['product', route.params.id],
-    // 查詢方式
+    key: () => [
+      'product',
+      'detail',
+      route.params.id,
+    ],
+
     query: async () => {
-      const { data } = await product.getId(route.params.id)
+      const { data } =
+        await productService.getProductById(
+          route.params.id,
+        )
+
       return data.result
     },
-    // 快取保留時間
+
     staleTime: STALE_TIME,
   })
 })
 
-export const useCreateMutation = defineMutation(() => {
+export const useCreateProductMutation = defineMutation(() => {
+  const queryCache = useQueryCache()
+
   return useMutation({
-    mutation: (data: ProductForm) => product.create(data),
+    mutation: (data: ProductForm) =>
+      productService.createProduct(data),
+
     onSuccess: () => {
-      // 將指定的快取標記為過期，會重新取得資料
-      const queryCache = useQueryCache()
-      queryCache.invalidateQueries({ key: ['product', 'public'] })
-      queryCache.invalidateQueries({ key: ['product', 'all'] })
+      queryCache.invalidateQueries({
+        key: ['product', 'public'],
+      })
+
+      queryCache.invalidateQueries({
+        key: ['product', 'admin'],
+      })
     },
   })
 })
 
-export const useUpdateMutation = defineMutation(() => {
+export const useUpdateProductMutation = defineMutation(() => {
+  const queryCache = useQueryCache()
+
   return useMutation({
-    mutation: ({ id, data }: { id: string, data: ProductForm }) => product.update(id, data),
+    mutation: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: ProductForm
+    }) => productService.updateProduct(id, data),
+
     onSuccess: (response, { id }) => {
-      // 將指定的快取標記為過期，會重新取得資料
-      const queryCache = useQueryCache()
-      queryCache.invalidateQueries({ key: ['product', 'public'] })
-      queryCache.invalidateQueries({ key: ['product', 'all'] })
-      // 更新指定快取的資料
-      queryCache.setQueryData(['product', id], response.data.result)
+      queryCache.invalidateQueries({
+        key: ['product', 'public'],
+      })
+
+      queryCache.invalidateQueries({
+        key: ['product', 'admin'],
+      })
+
+      queryCache.setQueryData(
+        ['product', 'detail', id],
+        response.data.result,
+      )
     },
   })
 })

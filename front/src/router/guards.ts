@@ -33,6 +33,7 @@ export function setupRouterGuards(router: Router): void {
      *
      * Router Guard 不屬於元件 setup 或 effect scope，
      * 因此不在這裡呼叫 Pinia Colada mutation composable。
+     * → 只負責初次恢復登入狀態(by ChatGPT)
      */
     if (from === START_LOCATION && !isAuthInitialized) {
       isAuthInitialized = true

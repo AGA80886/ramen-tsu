@@ -1,39 +1,54 @@
+import type { AxiosResponse } from 'axios'
+
 import type { ApiResponse } from '@/types/api'
 import type { IProduct, ProductForm } from '@/types/product'
-import type { AxiosResponse } from 'axios'
-import { api, apiAuth } from '@/utils/api'
 
-function buildProductFormData (data: ProductForm) {
-  const fd = new FormData()
-  fd.append('name', data.name)
-  fd.append('price', data.price.toString())
-  fd.append('description', data.description)
-  fd.append('category', data.category)
-  fd.append('sell', data.sell.toString())
+import { api, apiAuth } from './api'
+
+function buildProductFormData(data: ProductForm): FormData {
+  const formData = new FormData()
+
+  formData.append('name', data.name)
+  formData.append('price', data.price.toString())
+  formData.append('description', data.description)
+  formData.append('category', data.category)
+  formData.append('sell', data.sell.toString())
+
   if (data.image) {
-    fd.append('image', data.image)
+    formData.append('image', data.image)
   }
-  return fd
+
+  return formData
 }
 
-export function create (data: ProductForm): Promise<AxiosResponse<ApiResponse<IProduct>>> {
-  const fd = buildProductFormData(data)
-  return apiAuth.post('/product', fd)
+export function createProduct(
+  data: ProductForm,
+): Promise<AxiosResponse<ApiResponse<IProduct>>> {
+  return apiAuth.post('/product', buildProductFormData(data))
 }
 
-export function update (id: string, data: ProductForm): Promise<AxiosResponse<ApiResponse<IProduct>>> {
-  const fd = buildProductFormData(data)
-  return apiAuth.patch(`/product/${id}`, fd)
+export function updateProduct(
+  id: string,
+  data: ProductForm,
+): Promise<AxiosResponse<ApiResponse<IProduct>>> {
+  return apiAuth.patch(
+    `/product/${id}`,
+    buildProductFormData(data),
+  )
 }
 
-export function get (): Promise<AxiosResponse<ApiResponse<IProduct[]>>> {
-  return api.get(`/product`)
+export function getProducts():
+Promise<AxiosResponse<ApiResponse<IProduct[]>>> {
+  return api.get('/product')
 }
 
-export function getAll (): Promise<AxiosResponse<ApiResponse<IProduct[]>>> {
-  return apiAuth.get(`/product/all`)
+export function getAdminProducts():
+Promise<AxiosResponse<ApiResponse<IProduct[]>>> {
+  return apiAuth.get('/product/all')
 }
 
-export function getId (id: string): Promise<AxiosResponse<ApiResponse<IProduct>>> {
+export function getProductById(
+  id: string,
+): Promise<AxiosResponse<ApiResponse<IProduct>>> {
   return api.get(`/product/${id}`)
-}
+} 

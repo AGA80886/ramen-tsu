@@ -1,4 +1,4 @@
-import { refreshAccessToken } from '@/utils/api'
+import { refreshAccessToken } from '@/services/api'
 import { useUserStore } from '@/stores/user'
 
 let initializationPromise: Promise<void> | undefined

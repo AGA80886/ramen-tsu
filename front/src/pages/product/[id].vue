@@ -1,38 +1,84 @@
 <template>
-  <div v-if="product" class="product-page">
+  <div
+    v-if="product"
+    class="product-page"
+  >
     <el-row :gutter="24">
-      <el-col :xs="24" :md="12">
-        <el-image class="detail-image" fit="cover" :src="product.imageUrl" />
+      <el-col
+        :xs="24"
+        :md="12"
+      >
+        <el-image
+          class="detail-image"
+          fit="cover"
+          :src="product.imageUrl"
+        />
       </el-col>
-      <el-col :xs="24" :md="12">
+      <el-col
+        :xs="24"
+        :md="12"
+      >
         <h1>{{ product.name }}</h1>
         <el-tag>{{ product.category }}</el-tag>
-        <p class="description">{{ product.description }}</p>
-        <el-select v-model="quantity" placeholder="選擇數量" style="width: 100%">
-          <el-option v-for="option in quantityOptions" :key="option" :label="option" :value="option" />
+        <p class="description">
+          {{ product.description }}
+        </p>
+        <el-select
+          v-model="quantity"
+          placeholder="選擇數量"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="option in quantityOptions"
+            :key="option"
+            :label="option"
+            :value="option"
+          />
         </el-select>
-        <el-button class="cart-button" type="primary" plain @click="addCart">
+        <el-button
+          class="cart-button"
+          type="primary"
+          plain
+          @click="addCart"
+        >
           <el-icon><ShoppingCart /></el-icon>
           加入購物車
         </el-button>
       </el-col>
     </el-row>
 
-    <div v-if="!product.sell" class="sold-out-overlay">
-      <el-result icon="warning" title="商品已下架">
-        <template #extra><el-button type="primary" @click="router.push('/')">回首頁</el-button></template>
+    <div
+      v-if="!product.sell"
+      class="sold-out-overlay"
+    >
+      <el-result
+        icon="warning"
+        title="商品已下架"
+      >
+        <template #extra>
+          <el-button
+            type="primary"
+            @click="router.push('/')"
+          >
+            回首頁
+          </el-button>
+        </template>
       </el-result>
     </div>
   </div>
-  <el-skeleton v-else :rows="8" animated />
+  <el-skeleton
+    v-else
+    :rows="8"
+    animated
+  />
 </template>
 
 <script setup lang="ts">
 import { ShoppingCart } from '@element-plus/icons-vue'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useGetIdQuery } from '@/queries/product'
-import { useAddCartMutation } from '@/queries/user'
+import { useProductByIdQuery } from '@/queries/product'
+import { useAddCartItemMutation } from '@/queries/cart'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useUserStore } from '@/stores/user'
 
@@ -41,7 +87,8 @@ const quantityOptions = Array.from({ length: 20 }, (_, idx) => idx + 1)
 const router = useRouter()
 const user = useUserStore()
 const snackbar = useSnackbarStore()
-const { data: product, error } = useGetIdQuery()
+const { data: product, error } = useProductByIdQuery()
+const addCartItemMutation = useAddCartItemMutation()
 
 watch(error, e => { if (e) router.push('/') })
 watch(product, () => { if (product.value) document.title = product.value.name }, { immediate: true })
@@ -52,7 +99,15 @@ async function addCart () {
       await router.push('/login')
       return
     }
-    await useAddCartMutation().mutateAsync({ product: product.value!._id, quantity: quantity.value, replace: false })
+    if (!product.value) {
+  return
+}
+
+await addCartItemMutation.mutateAsync({
+  product: product.value._id,
+  quantity: quantity.value,
+  replace: false,
+})
     snackbar.add({ text: '加入購物車成功', color: 'green' })
   } catch (error) { snackbar.addError(error) }
 }

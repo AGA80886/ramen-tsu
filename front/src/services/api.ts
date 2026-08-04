@@ -1,13 +1,9 @@
-import type {
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from 'axios'
+import type { AxiosResponse, InternalAxiosRequestConfig, } from 'axios'
 import type { ApiResponse } from '@/types/api'
 import type { LoginResponse } from '@/types/auth'
-
 import axios, { AxiosError } from 'axios'
-
 import { useUserStore } from '@/stores/user'
+import { pinia } from '@/plugins/pinia'
 
 const baseURL = import.meta.env.VITE_API_URL
 
@@ -33,14 +29,16 @@ let refreshPromise:
 
 export function refreshAccessToken():
 Promise<AxiosResponse<ApiResponse<LoginResponse>>> {
+  const user = useUserStore(pinia)
+
   refreshPromise ??= refreshClient
     .post<ApiResponse<LoginResponse>>('/auth/refresh')
     .then(response => {
-      useUserStore().login(response.data.result)
+      user.login(response.data.result)
       return response
     })
     .catch(error => {
-      useUserStore().logout()
+      user.logout()
       throw error
     })
     .finally(() => {
@@ -50,8 +48,8 @@ Promise<AxiosResponse<ApiResponse<LoginResponse>>> {
   return refreshPromise
 }
 
-apiAuth.interceptors.request.use(async config => {
-  const user = useUserStore()
+apiAuth.interceptors.request.use(config => {
+  const user = useUserStore(pinia)
 
   if (user.accessToken) {
     config.headers.set(

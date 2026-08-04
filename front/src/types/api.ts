@@ -1,6 +1,16 @@
-// 統一 API 回應格式的型別
-export interface ApiResponse<T = unknown> {
+export interface ApiResponse<T> {
   success: boolean
   message: string
   result: T
+}
+
+export interface ApiErrorResponse {
+  success?: false
+  message: string
+  errors?: Record<string, string[]>
+}
+
+export interface ApiMessageResponse {
+  success: boolean
+  message: string
 }
