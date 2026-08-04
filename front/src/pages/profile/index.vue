@@ -11,8 +11,27 @@
       :loading="isLoading"
       text="正在載入會員資料..."
     >
+      <!-- API 載入失敗 -->
       <AppCard
-        v-if="profile"
+        v-if="error"
+        class="profile-state"
+      >
+        <AppEmpty description="無法取得會員資料" />
+
+        <div class="state-actions">
+          <AppButton
+            type="primary"
+            :loading="isReloading"
+            @click="reloadProfile"
+          >
+            重新載入
+          </AppButton>
+        </div>
+      </AppCard>
+
+      <!-- 成功取得會員資料 -->
+      <AppCard
+        v-else-if="profile"
         class="profile-card"
       >
         <div class="profile-layout">
@@ -128,10 +147,13 @@
         </div>
       </AppCard>
 
-      <AppEmpty
+      <!-- API 已完成但沒有資料 -->
+      <AppCard
         v-else
-        description="無法取得會員資料"
-      />
+        class="profile-state"
+      >
+        <AppEmpty description="目前沒有會員資料" />
+      </AppCard>
     </AppLoading>
   </section>
 </template>
@@ -155,8 +177,12 @@ const avatarInput = ref<HTMLInputElement | null>(null)
 
 const {
   data: profile,
+  error,
   isLoading,
+  refetch,
 } = useProfileQuery()
+
+const isReloading = ref(false)
 
 const updateProfileMutation = useUpdateProfileMutation()
 const updateAvatarMutation = useUpdateAvatarMutation()
@@ -224,7 +250,7 @@ const isProfileChanged = computed(() => {
 
   return (
     nickname.value.trim() !== profile.value.nickname ||
-    email.value.trim().toLowerCase() !== profile.value.email
+    email.value.trim().toLowerCase() !== profile.value.email.trim().toLowerCase()
   )
 })
 
@@ -243,6 +269,31 @@ function resetProfileForm(): void {
       email: profile.value.email,
     },
   })
+
+  snackbar.add({
+    text: '會員資料已重設',
+    color: 'info',
+  })
+}
+
+async function reloadProfile(): Promise<void> {
+  isReloading.value = true
+
+  try {
+    await refetch()
+
+    snackbar.add({
+      text: '會員資料已重新載入',
+      color: 'success',
+    })
+  } catch (reloadError) {
+    snackbar.add({
+      text: getApiErrorMessage(reloadError),
+      color: 'error',
+    })
+  } finally {
+    isReloading.value = false
+  }
 }
 
 const submitProfile = handleSubmit(async values => {
@@ -400,6 +451,17 @@ meta:
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
+}
+
+.profile-state {
+  min-height: 480px;
+  padding: 40px;
+}
+
+.state-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 @media (max-width: 768px) {

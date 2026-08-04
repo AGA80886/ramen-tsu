@@ -9,7 +9,7 @@ export type SnackbarColor =
   | 'info'
 export interface SnackbarMessage {
   text: string
-  color?: 'success' | 'error' | 'warning' | 'info'
+  color?: SnackbarColor
 }
 
 export const useSnackbarStore = defineStore('snackbar', () => {

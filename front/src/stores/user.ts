@@ -1,4 +1,7 @@
-import type { LoginResponse, UserRole, } from '@/types/auth'
+import type {
+  LoginResponse,
+  UserRole,
+} from '@/types/auth'
 import type { UserProfile } from '@/types/profile'
 
 import { defineStore } from 'pinia'
