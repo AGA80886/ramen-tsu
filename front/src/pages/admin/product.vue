@@ -272,8 +272,8 @@ function closeDialog () {
   dialog.value.open = false
 }
 const submit = handleSubmit(async values => {
-  if (fileRecords.value[0]?.error) return snackbar.add({ text: '檔案格式錯誤', color: 'red' })
-  if (!dialog.value.id && fileRecords.value.length === 0) return snackbar.add({ text: '缺少圖片', color: 'red' })
+  if (fileRecords.value[0]?.error) return snackbar.add({ text: '檔案格式錯誤', color: 'error' })
+  if (!dialog.value.id && fileRecords.value.length === 0) return snackbar.add({ text: '缺少圖片', color: 'error' })
   try {
     const data = { ...values, category: values.category as TCategoryOptions, image: fileRecords.value[0]?.file }
     if (dialog.value.id) {
@@ -284,7 +284,7 @@ const submit = handleSubmit(async values => {
 } else {
   await createProductMutation.mutateAsync(data)
 }
-    snackbar.add({ text: '儲存成功', color: 'green' })
+    snackbar.add({ text: '儲存成功', color: 'success' })
     closeDialog()
   } catch (error) { snackbar.addError(error) }
 })

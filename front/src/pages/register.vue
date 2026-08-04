@@ -80,7 +80,7 @@ const [confirmPassword] = defineField('confirmPassword')
 const submit = handleSubmit(async values => {
   try {
     await register({ account: values.account, password: values.password })
-    snackbar.add({ text: '註冊成功', color: 'green' })
+    snackbar.add({ text: '註冊成功', color: 'success' })
     await router.push('/login')
   } catch (error) { snackbar.addError(error) }
 })

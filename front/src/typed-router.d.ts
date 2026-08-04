@@ -80,6 +80,13 @@ declare module 'vue-router/auto-routes' {
       { id: ParamValue<false> },
       | never
     >,
+    '/profile/': RouteRecordInfo<
+      '/profile/',
+      '/profile',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/register': RouteRecordInfo<
       '/register',
       '/register',
@@ -155,6 +162,14 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | 'id'
+    }
+    'src/pages/profile/index.vue': {
+      routes:
+        | '/profile/'
+      views:
+        | never
+      pathParamNames:
+        | never
     }
     'src/pages/register.vue': {
       routes:
