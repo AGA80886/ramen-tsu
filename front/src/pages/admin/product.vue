@@ -204,7 +204,11 @@ import { Check, Close, Edit, Plus, Search } from '@element-plus/icons-vue'
 import { useForm } from 'vee-validate'
 import { computed, ref, useTemplateRef } from 'vue'
 import * as yup from 'yup'
-import { useCreateMutation, useGetAllQuery, useUpdateMutation } from '@/queries/product'
+import {
+  useAdminProductsQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} from '@/queries/product'
 import { useSnackbarStore } from '@/stores/snackbar'
 
 interface FileAgentInstance {
@@ -216,11 +220,19 @@ interface FileRecord {
   error?: unknown
 }
 
+const createProductMutation = useCreateProductMutation()
+const updateProductMutation = useUpdateProductMutation()
+
 const fileAgent = useTemplateRef<FileAgentInstance>('fileAgent')
 const snackbar = useSnackbarStore()
-const { data: products, isLoading } = useGetAllQuery()
+const {
+  data: products,
+  isLoading,
+} = useAdminProductsQuery()
 const search = ref('')
 const dialog = ref({ open: false, id: '' })
+
+
 const categoryOptions: TCategoryOptions[] = ['3C', '食品', '衣服']
 
 const filteredProducts = computed(() => {
@@ -264,7 +276,14 @@ const submit = handleSubmit(async values => {
   if (!dialog.value.id && fileRecords.value.length === 0) return snackbar.add({ text: '缺少圖片', color: 'red' })
   try {
     const data = { ...values, category: values.category as TCategoryOptions, image: fileRecords.value[0]?.file }
-    await (dialog.value.id ? useUpdateMutation().mutateAsync({ id: dialog.value.id, data }) : useCreateMutation().mutateAsync(data))
+    if (dialog.value.id) {
+  await updateProductMutation.mutateAsync({
+    id: dialog.value.id,
+    data,
+  })
+} else {
+  await createProductMutation.mutateAsync(data)
+}
     snackbar.add({ text: '儲存成功', color: 'green' })
     closeDialog()
   } catch (error) { snackbar.addError(error) }

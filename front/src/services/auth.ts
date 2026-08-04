@@ -6,7 +6,7 @@ import type {
   RegisterForm,
 } from '@/types/auth'
 
-import { apiAuth, refreshAccessToken } from '@/utils/api'
+import { apiAuth, refreshAccessToken } from '@/services/api'
 
 export function register(
   data: RegisterForm,
