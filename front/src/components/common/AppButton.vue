@@ -1,5 +1,6 @@
 <template>
   <ElButton
+    v-bind="attrs"
     class="app-button"
     :type="type"
     :size="size"
@@ -19,6 +20,7 @@
 
 <script setup lang="ts">
 import type { ButtonProps } from 'element-plus'
+import { useAttrs } from 'vue'
 
 interface Props {
   type?: ButtonProps['type']
@@ -45,6 +47,8 @@ withDefaults(defineProps<Props>(), {
   text: false,
   link: false,
 })
+
+const attrs = useAttrs()
 
 const emit = defineEmits<{
   click: [event: MouseEvent]

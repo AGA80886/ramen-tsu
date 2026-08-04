@@ -108,7 +108,7 @@ await addCartItemMutation.mutateAsync({
   quantity: quantity.value,
   replace: false,
 })
-    snackbar.add({ text: '加入購物車成功', color: 'green' })
+    snackbar.add({ text: '加入購物車成功', color: 'success' })
   } catch (error) { snackbar.addError(error) }
 }
 </script>

@@ -1,11 +1,16 @@
-import type { LoginResponse } from '@/types/auth'
+import type { LoginResponse, UserRole, } from '@/types/auth'
+import type { UserProfile } from '@/types/profile'
+
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 export const useUserStore = defineStore('user', () => {
   const accessToken = ref('')
   const account = ref('')
-  const role = ref<'user' | 'admin'>('user')
+  const email = ref('')
+  const nickname = ref('')
+  const avatar = ref('')
+  const role = ref<UserRole>('user')
   const cart = ref(0)
 
   const isLoggedIn = computed(() => {
@@ -16,16 +21,27 @@ export const useUserStore = defineStore('user', () => {
     return role.value === 'admin'
   })
 
-  const login = (data: LoginResponse) => {
+  function login(data: LoginResponse): void {
     accessToken.value = data.accessToken
     account.value = data.account
     role.value = data.role
     cart.value = data.cart
   }
 
-  const logout = () => {
+  function updateProfile(profile: UserProfile): void {
+    account.value = profile.account
+    email.value = profile.email
+    nickname.value = profile.nickname
+    avatar.value = profile.avatar
+    role.value = profile.role
+  }
+
+  function logout(): void {
     accessToken.value = ''
     account.value = ''
+    email.value = ''
+    nickname.value = ''
+    avatar.value = ''
     role.value = 'user'
     cart.value = 0
   }
@@ -33,11 +49,17 @@ export const useUserStore = defineStore('user', () => {
   return {
     accessToken,
     account,
+    email,
+    nickname,
+    avatar,
     role,
     cart,
+
     isLoggedIn,
     isAdmin,
+
     login,
+    updateProfile,
     logout,
   }
 })

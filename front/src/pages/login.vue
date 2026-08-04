@@ -66,7 +66,7 @@ const [password] = defineField('password')
 const submit = handleSubmit(async values => {
   try {
     await login(values)
-    snackbar.add({ text: '登入成功', color: 'green' })
+    snackbar.add({ text: '登入成功', color: 'success' })
     await router.push('/')
   } catch (error) { snackbar.addError(error) }
 })
