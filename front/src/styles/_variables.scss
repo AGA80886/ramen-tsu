@@ -21,3 +21,8 @@ $color-surface-dark: #242424;
 $color-text-dark: #f5f5f5;
 $color-text-secondary-dark: #c0c4cc;
 $color-border-dark: #4c4d4f;
+
+:root {
+  --color-primary-hover: rgba(139, 69, 19, 0.1);
+  --color-primary-active: rgba(139, 69, 19, 0.15);
+}

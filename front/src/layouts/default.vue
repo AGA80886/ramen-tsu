@@ -88,10 +88,12 @@
           </el-menu>
 
           <!-- 已登入會員名稱：放在訂單與登出之間 -->
-          <div
+          <el-button
             v-if="user.isLoggedIn"
+            text
             class="member-info"
-            aria-label="目前登入會員"
+            aria-label="前往會員中心"
+            @click="goToProfile"
           >
             <el-icon :size="20">
               <Avatar />
@@ -100,7 +102,7 @@
             <span class="member-name">
               {{ memberName }}
             </span>
-          </div>
+          </el-button>
 
           <el-tooltip
             v-if="user.isLoggedIn"
@@ -110,6 +112,7 @@
             <el-button
               text
               circle
+              class="header-icon-button"
               aria-label="登出"
               @click="logout"
             >
@@ -119,22 +122,24 @@
             </el-button>
           </el-tooltip>
 
-          <DarkModeToggle />
+          <DarkModeToggle class="header-icon-button" />
         </div>
 
         <!-- 手機版功能 -->
         <div class="mobile-actions">
-          <DarkModeToggle />
+          <DarkModeToggle class="header-icon-button" />
 
           <el-dropdown
             trigger="click"
             placement="bottom-end"
+            popper-class="mobile-nav-dropdown"
             :hide-on-click="true"
             @command="handleMobileCommand"
           >
             <el-button
               text
               circle
+              class="header-icon-button"
               aria-label="開啟導覽選單"
             >
               <el-icon :size="24">
@@ -201,13 +206,14 @@
 
                 <el-dropdown-item
                   v-if="user.isLoggedIn"
+                  command="/profile"
                   divided
-                  disabled
                   class="mobile-member-info"
                 >
                   <el-icon>
                     <Avatar />
                   </el-icon>
+
                   {{ memberName }}
                 </el-dropdown-item>
 
@@ -333,20 +339,7 @@ const logoutMutation = useLogoutMutation()
  * 會依序嘗試 name、nickname、account、email。
  */
 const memberName = computed(() => {
-  const currentUser = user as unknown as {
-    name?: string
-    nickname?: string
-    account?: string
-    email?: string
-  }
-
-  return (
-    currentUser.name ||
-    currentUser.nickname ||
-    currentUser.account ||
-    currentUser.email ||
-    '會員'
-  )
+  return user.nickname || user.account || user.email || '會員'
 })
 
 async function logout() {
@@ -378,14 +371,20 @@ async function handleMobileCommand(command: string | number | object) {
     await router.push(command)
   }
 }
+
+async function goToProfile(): Promise<void> {
+  if (route.path !== '/profile') {
+    await router.push('/profile')
+  }
+}
 </script>
 
 
 <style scoped lang="scss">
 .site-layout {
   min-height: 100vh;
-  background-color: var(--color-background);
   color: var(--color-text);
+  background-color: var(--color-background);
   transition:
     background-color var(--transition-normal),
     color var(--transition-normal);
@@ -447,59 +446,126 @@ async function handleMobileCommand(command: string | number | object) {
   font-size: 14px;
 }
 
-/* Navbar 右側功能 */
+/* 桌面版 Navbar */
 
 .header-actions {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  gap: 8px;
+  gap: 4px;
+  min-width: 0;
   margin-left: auto;
 }
 
 .account-menu {
+  height: 100%;
   border-bottom: none;
   background-color: transparent;
 }
 
 .account-menu.el-menu--horizontal {
-  height: 63px;
+  height: 100%;
+  border-bottom: none;
 }
 
 .account-menu :deep(.el-menu-item) {
-  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  margin: 0 2px;
+  padding: 0 12px;
+  border: 0 !important;
+  border-radius: 6px;
+  color: var(--color-primary);
+  font-weight: 500;
   white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.account-menu :deep(.el-menu-item:hover),
+.account-menu :deep(.el-menu-item:focus),
+.account-menu :deep(.el-menu-item.is-active) {
+  color: var(--color-primary);
+  background-color: var(--el-color-primary-light-9);
+}
+
+.account-menu :deep(.el-menu-item::after) {
+  display: none;
+}
+
+.account-menu :deep(.el-menu-item .el-icon) {
+  color: inherit;
 }
 
 .cart-badge {
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 .member-info {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 6px;
-  max-width: 180px;
-  padding: 8px 10px;
-  color: var(--color-text-secondary);
+  height: 44px;
+  max-width: 160px;
+  margin: 0 2px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--color-primary);
+  background-color: transparent;
+  font-weight: 500;
   white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.member-info:hover,
+.member-info:focus-visible {
+  color: var(--color-primary);
+  background-color: var(--el-color-primary-light-9) !important;
+}
+
+.member-info :deep(.el-icon),
+.member-name {
+  color: inherit;
 }
 
 .member-name {
   overflow: hidden;
-  font-weight: 600;
   text-overflow: ellipsis;
+}
+
+.header-actions :deep(.header-icon-button),
+.mobile-actions :deep(.header-icon-button) {
+  color: var(--color-primary);
+  background-color: transparent;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.header-actions :deep(.header-icon-button:hover),
+.header-actions :deep(.header-icon-button:focus-visible),
+.mobile-actions :deep(.header-icon-button:hover),
+.mobile-actions :deep(.header-icon-button:focus-visible) {
+  color: var(--color-primary);
+  background-color: var(--el-color-primary-light-9);
 }
 
 .mobile-actions {
   display: none;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   margin-left: auto;
 }
 
 .mobile-cart-badge {
-  margin-left: 10px;
+  margin-left: auto;
 }
 
 /* Sidebar 與主內容 */
@@ -519,14 +585,32 @@ async function handleMobileCommand(command: string | number | object) {
 
 .sidebar-menu {
   min-height: 100%;
-  padding-top: 16px;
+  padding: 16px 10px;
   border-right: none;
   background-color: transparent;
 }
 
 .sidebar-menu :deep(.el-menu-item) {
-  margin: 4px 12px;
-  border-radius: var(--radius-md);
+  height: 48px;
+  margin: 4px 0;
+  padding: 0 16px !important;
+  border-radius: 6px;
+  color: var(--color-primary);
+  font-weight: 500;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.sidebar-menu :deep(.el-menu-item:hover),
+.sidebar-menu :deep(.el-menu-item:focus),
+.sidebar-menu :deep(.el-menu-item.is-active) {
+  color: var(--color-primary);
+  background-color: var(--el-color-primary-light-9);
+}
+
+.sidebar-menu :deep(.el-menu-item .el-icon) {
+  color: inherit;
 }
 
 .site-main {
@@ -536,7 +620,53 @@ async function handleMobileCommand(command: string | number | object) {
   background-color: var(--color-background);
 }
 
+/*
+ * el-dropdown 會 Teleport 到 body，scoped selector 無法直接命中，
+ * 因此搭配 popper-class 使用 :global。
+ */
+:global(.mobile-nav-dropdown .el-dropdown-menu) {
+  min-width: 220px;
+  padding: 8px;
+}
+
+:global(.mobile-nav-dropdown .el-dropdown-menu__item) {
+  min-height: 44px;
+  margin: 2px 0;
+  padding: 0 12px;
+  border-radius: 6px;
+  color: var(--color-primary);
+  font-weight: 500;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+:global(.mobile-nav-dropdown .el-dropdown-menu__item:hover),
+:global(.mobile-nav-dropdown .el-dropdown-menu__item:focus) {
+  color: var(--color-primary);
+  background-color: var(--el-color-primary-light-9);
+}
+
+:global(.mobile-nav-dropdown .el-dropdown-menu__item .el-icon) {
+  color: inherit;
+}
+
+:global(.mobile-nav-dropdown .el-dropdown-menu__item.is-divided) {
+  margin-top: 8px;
+}
+
 /* 平板與手機 */
+
+@media (max-width: 1100px) {
+  .account-menu :deep(.el-menu-item) {
+    padding: 0 8px;
+  }
+
+  .member-info {
+    max-width: 120px;
+    padding: 0 8px;
+  }
+}
 
 @media (max-width: 900px) {
   .desktop-actions {
