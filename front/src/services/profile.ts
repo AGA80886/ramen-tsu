@@ -1,11 +1,13 @@
 import type { AxiosResponse } from 'axios'
-import { apiAuth } from './api'
+import { api, apiAuth } from './api'
 import type { ApiResponse } from '@/types/api'
 import type { ApiMessageResponse } from '@/types/api'
+
 import type {
   UpdatePasswordPayload,
   UpdateProfilePayload,
   UserProfile,
+  VerifyEmailPayload,
 } from '@/types/profile'
 
 export function getProfile():
@@ -36,4 +38,15 @@ export function updatePassword(
   data: UpdatePasswordPayload,
 ): Promise<AxiosResponse<ApiMessageResponse>> {
   return apiAuth.patch('/user/me/password', data)
+}
+
+export function requestEmailVerification():
+Promise<AxiosResponse<ApiMessageResponse>> {
+  return apiAuth.post('/user/me/email-verification')
+}
+
+export function verifyEmail(
+  data: VerifyEmailPayload,
+): Promise<AxiosResponse<ApiMessageResponse>> {
+  return api.post('/user/email-verification/verify', data)
 }

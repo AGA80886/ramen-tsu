@@ -9,6 +9,8 @@ export interface UserProfile {
   role: UserRole
   createdAt: string
   updatedAt: string
+  emailVerified: boolean
+  emailVerifiedAt: string | null
 }
 
 export interface UpdateProfilePayload {
@@ -19,4 +21,8 @@ export interface UpdateProfilePayload {
 export interface UpdatePasswordPayload {
   currentPassword: string
   newPassword: string
+}
+
+export interface VerifyEmailPayload {
+  token: string
 }

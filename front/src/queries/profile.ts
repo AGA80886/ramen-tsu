@@ -11,7 +11,8 @@ import { useUserStore } from '@/stores/user'
 import type {
   UpdateProfilePayload,
   UpdatePasswordPayload,
- } from '@/types/profile'
+  VerifyEmailPayload,
+} from '@/types/profile'
 
 const PROFILE_QUERY_KEY = ['profile', 'me'] as const
 const STALE_TIME = 1000 * 60 * 5
@@ -78,3 +79,20 @@ export const useUpdateAvatarMutation = defineMutation(() => {
     },
   })
 })
+
+export const useVerifyEmailMutation =
+  defineMutation(() => {
+    return useMutation({
+      mutation: (data: VerifyEmailPayload) =>
+        profileService.verifyEmail(data),
+    })
+  })
+
+  export const useRequestEmailVerificationMutation =
+  defineMutation(() => {
+    return useMutation({
+      mutation: () =>
+        profileService.requestEmailVerification(),
+    })
+  })
+
