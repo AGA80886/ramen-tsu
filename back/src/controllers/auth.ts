@@ -5,7 +5,7 @@ import * as yup from 'yup'
 import validator from 'validator'
 import { StatusCodes } from 'http-status-codes'
 import jsonwebtoken from 'jsonwebtoken'
-import { random, cookieOptions, hash } from '../utils/refreshToken'
+import { random, cookieOptions, hash } from '../utils/token'
 
 export const register = async (req: Request, res: Response) => {
   // 先對收到的 req.body 進行格式驗證後才對資料做處理

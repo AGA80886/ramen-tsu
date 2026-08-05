@@ -19,6 +19,8 @@ export interface IUser {
   role: 'user' | 'admin'
   createdAt: Date
   updatedAt: Date
+  emailVerified: boolean
+  emailVerifiedAt?: Date
 }
 
 // Document = 純資料
@@ -61,6 +63,14 @@ const schema = new Schema<IUser>(
         validator: (value?: string) => !value || validator.isEmail(value),
         message: 'Email 格式錯誤',
       },
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerifiedAt: {
+      type: Date,
+      default: null,
     },
     nickname: {
       type: String,

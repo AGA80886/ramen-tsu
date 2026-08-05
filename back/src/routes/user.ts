@@ -13,4 +13,7 @@ router.patch('/me/password', middlewareAuth.jwt, controllerUser.updatePassword)
 router.patch('/cart', middlewareAuth.jwt, controllerUser.cart)
 router.get('/cart', middlewareAuth.jwt, controllerUser.getCart)
 
+router.post('/me/email-verification', middlewareAuth.jwt, controllerUser.requestEmailVerification)
+router.post('/email-verification/verify', controllerUser.verifyEmail)
+
 export default router

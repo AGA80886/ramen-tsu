@@ -7,11 +7,16 @@ import { Types } from 'mongoose'
 import User, { type UserDocument } from '../models/user'
 import Product from '../models/product'
 import cloudinary from '../configs/cloudinary'
+import EmailVerificationToken from '../models/emailVerificationToken'
+import { createRandomToken, hashToken } from '../utils/token'
+import { sendVerificationEmail } from '../services/mail'
 
 const toProfileResponse = (user: UserDocument) => ({
   _id: user._id.toString(),
   account: user.account,
   email: user.email ?? '',
+  emailVerified: user.emailVerified ?? false,
+  emailVerifiedAt: user.emailVerifiedAt ?? null,
   nickname: user.nickname ?? '',
   avatar: user.avatar ?? '',
   role: user.role,
@@ -203,5 +208,110 @@ export const updatePassword = async (req: Request, res: Response): Promise<void>
   res.status(StatusCodes.OK).json({
     success: true,
     message: '密碼修改成功',
+  })
+}
+
+export const requestEmailVerification = async (req: Request, res: Response): Promise<void> => {
+  const user = await User.findById(req.user!._id).orFail(new Error('USER_NOT_FOUND'))
+
+  if (!user.email) {
+    throw new Error('EMAIL_REQUIRED')
+  }
+
+  if (user.emailVerified) {
+    throw new Error('EMAIL_ALREADY_VERIFIED')
+  }
+
+  await EmailVerificationToken.deleteMany({
+    user: user._id,
+  })
+
+  const rawToken = createRandomToken()
+  const tokenHash = hashToken(rawToken)
+
+  await EmailVerificationToken.create({
+    user: user._id,
+    tokenHash,
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+  })
+
+  try {
+    await sendVerificationEmail({
+      email: user.email,
+      token: rawToken,
+    })
+  } catch (error) {
+    await EmailVerificationToken.deleteOne({
+      tokenHash,
+    })
+
+    throw error
+  }
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '驗證信已寄出',
+  })
+}
+const verifyEmailSchema = yup.object({
+  token: yup.string().trim().required('缺少驗證 Token'),
+})
+
+export const verifyEmail = async (req: Request, res: Response): Promise<void> => {
+  const body = await verifyEmailSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  })
+
+  const tokenHash = hashToken(body.token)
+
+  const verificationToken = await EmailVerificationToken.findOne({
+    tokenHash,
+  })
+
+  if (!verificationToken) {
+    throw new Error('EMAIL_VERIFICATION_TOKEN_INVALID')
+  }
+
+  if (verificationToken.expiresAt.getTime() <= Date.now()) {
+    await verificationToken.deleteOne()
+
+    throw new Error('EMAIL_VERIFICATION_TOKEN_EXPIRED')
+  }
+
+  const user = await User.findById(verificationToken.user)
+
+  if (!user) {
+    await verificationToken.deleteOne()
+
+    throw new Error('USER_NOT_FOUND')
+  }
+
+  if (user.emailVerified) {
+    await EmailVerificationToken.deleteMany({
+      user: user._id,
+    })
+
+    throw new Error('EMAIL_ALREADY_VERIFIED')
+  }
+
+  user.emailVerified = true
+  user.emailVerifiedAt = new Date()
+
+  await user.save()
+
+  console.log('Email verification saved:', {
+    userId: user._id.toString(),
+    emailVerified: user.emailVerified,
+    emailVerifiedAt: user.emailVerifiedAt,
+  })
+
+  await EmailVerificationToken.deleteMany({
+    user: user._id,
+  })
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: 'Email 驗證成功',
   })
 }

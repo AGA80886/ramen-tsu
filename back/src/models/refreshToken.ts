@@ -1,5 +1,5 @@
 import { Schema, model, type HydratedDocument, Types } from 'mongoose'
-import { hash } from '../utils/refreshToken'
+import { hash } from '../utils/token'
 
 export interface IRefreshToken {
   _id: Types.ObjectId
