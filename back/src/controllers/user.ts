@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express'
 import * as yup from 'yup'
+import bcrypt from 'bcrypt'
 import validator from 'validator'
+import { StatusCodes } from 'http-status-codes'
+import { Types } from 'mongoose'
 import User, { type UserDocument } from '../models/user'
 import Product from '../models/product'
 import cloudinary from '../configs/cloudinary'
-import { StatusCodes } from 'http-status-codes'
-import { Types } from 'mongoose'
 
 const toProfileResponse = (user: UserDocument) => ({
   _id: user._id.toString(),
@@ -155,5 +156,52 @@ export const getCart = async (req: Request, res: Response) => {
     success: true,
     message: '',
     result: user!.cart,
+  })
+}
+
+const updatePasswordSchema = yup.object({
+  currentPassword: yup.string().required('請輸入目前密碼'),
+
+  newPassword: yup
+    .string()
+    .required('請輸入新密碼')
+    .min(4, '新密碼至少需要 4 個字')
+    .max(20, '新密碼最多 20 個字')
+    .test('different-password', '新密碼不可與目前密碼相同', function (value) {
+      return value !== this.parent.currentPassword
+    }),
+})
+
+export const updatePassword = async (req: Request, res: Response): Promise<void> => {
+  const body = await updatePasswordSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  })
+
+  const user = await User.findById(req.user!._id)
+    .select('+password')
+    .orFail(new Error('USER_NOT_FOUND'))
+
+  const isPasswordCorrect = await bcrypt.compare(body.currentPassword, user.password)
+
+  if (!isPasswordCorrect) {
+    throw new Error('CURRENT_PASSWORD_INCORRECT')
+  }
+
+  const isSamePassword = await bcrypt.compare(body.newPassword, user.password)
+
+  if (isSamePassword) {
+    throw new Error('PASSWORD_NOT_CHANGED')
+  }
+
+  // 只指派明文密碼。
+  // User Model 的 pre('save') 會負責驗證與 bcrypt hash。
+  user.password = body.newPassword
+
+  await user.save()
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '密碼修改成功',
   })
 }

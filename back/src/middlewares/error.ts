@@ -71,6 +71,20 @@ export default async (
         })
         return
 
+      case 'CURRENT_PASSWORD_INCORRECT':
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: '目前密碼錯誤',
+        })
+        return
+
+      case 'PASSWORD_NOT_CHANGED':
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: '新密碼不可與目前密碼相同',
+        })
+        return
+
       case 'ADMIN':
         res.status(StatusCodes.FORBIDDEN).json({
           success: false,
