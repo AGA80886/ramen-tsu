@@ -1,8 +1,9 @@
 import type { AxiosResponse } from 'axios'
-
 import { apiAuth } from './api'
 import type { ApiResponse } from '@/types/api'
+import type { ApiMessageResponse } from '@/types/api'
 import type {
+  UpdatePasswordPayload,
   UpdateProfilePayload,
   UserProfile,
 } from '@/types/profile'
@@ -29,4 +30,10 @@ export function updateAvatar(
     '/user/me/avatar',
     formData,
   )
+}
+
+export function updatePassword(
+  data: UpdatePasswordPayload,
+): Promise<AxiosResponse<ApiMessageResponse>> {
+  return apiAuth.patch('/user/me/password', data)
 }
