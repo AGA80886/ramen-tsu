@@ -137,7 +137,10 @@
                   type="primary"
                   native-type="submit"
                   :loading="isSubmitting"
-                  :disabled="!isProfileChanged"
+                  :disabled="
+                    !isProfileChanged ||
+                      updateProfileMutation.isLoading.value
+                  "
                 >
                   儲存修改
                 </AppButton>
@@ -162,6 +165,8 @@
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
+import { onBeforeRouteLeave } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 
 import {
   useProfileQuery,
@@ -248,9 +253,15 @@ const isProfileChanged = computed(() => {
     return false
   }
 
+  const originalNickname =
+    profile.value.nickname.trim()
+
+  const originalEmail =
+    profile.value.email.trim().toLowerCase()
+
   return (
-    nickname.value.trim() !== profile.value.nickname ||
-    email.value.trim().toLowerCase() !== profile.value.email.trim().toLowerCase()
+    nickname.value.trim() !== originalNickname ||
+    email.value.trim().toLowerCase() !== originalEmail
   )
 })
 
@@ -367,6 +378,28 @@ async function handleAvatarChange(event: Event): Promise<void> {
     })
   }
 }
+
+onBeforeRouteLeave(async () => {
+  if (!isProfileChanged.value) {
+    return true
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      '目前有尚未儲存的會員資料，確定要離開嗎？',
+      '尚未儲存',
+      {
+        confirmButtonText: '離開',
+        cancelButtonText: '繼續編輯',
+        type: 'warning',
+      },
+    )
+
+    return true
+  } catch {
+    return false
+  }
+})
 </script>
 
 <route lang="yaml">
