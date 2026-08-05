@@ -8,7 +8,10 @@ import {
 
 import * as profileService from '@/services/profile'
 import { useUserStore } from '@/stores/user'
-import type { UpdateProfilePayload } from '@/types/profile'
+import type {
+  UpdateProfilePayload,
+  UpdatePasswordPayload,
+ } from '@/types/profile'
 
 const PROFILE_QUERY_KEY = ['profile', 'me'] as const
 const STALE_TIME = 1000 * 60 * 5
@@ -45,6 +48,13 @@ export const useUpdateProfileMutation = defineMutation(() => {
         profile,
       )
     },
+  })
+})
+
+export const useUpdatePasswordMutation = defineMutation(() => {
+  return useMutation({
+    mutation: (data: UpdatePasswordPayload) =>
+      profileService.updatePassword(data),
   })
 })
 

@@ -150,6 +150,96 @@
         </div>
       </AppCard>
 
+      <!-- 修改密碼 -->
+      <AppCard
+        v-if="profile"
+        class="password-card"
+      >
+        <div class="password-section">
+          <header class="password-section__header">
+            <div>
+              <h2>修改密碼</h2>
+
+              <p>
+                為保護帳號安全，請先輸入目前密碼，再設定新密碼。
+              </p>
+            </div>
+          </header>
+
+          <el-form
+            label-position="top"
+            @submit.prevent="submitPassword"
+          >
+            <el-form-item
+              label="目前密碼"
+              :error="passwordErrors.currentPassword"
+            >
+              <el-input
+                v-model="currentPassword"
+                type="password"
+                show-password
+                autocomplete="current-password"
+                placeholder="請輸入目前密碼"
+              />
+            </el-form-item>
+
+            <el-form-item
+              label="新密碼"
+              :error="passwordErrors.newPassword"
+            >
+              <el-input
+                v-model="newPassword"
+                type="password"
+                show-password
+                autocomplete="new-password"
+                maxlength="20"
+                show-word-limit
+                placeholder="請輸入 4 至 20 個字的新密碼"
+              />
+            </el-form-item>
+
+            <el-form-item
+              label="確認新密碼"
+              :error="passwordErrors.confirmPassword"
+            >
+              <el-input
+                v-model="confirmPassword"
+                type="password"
+                show-password
+                autocomplete="new-password"
+                maxlength="20"
+                placeholder="請再次輸入新密碼"
+              />
+            </el-form-item>
+
+            <div class="password-actions">
+              <AppButton
+                native-type="button"
+                :disabled="
+                  !passwordMeta.dirty ||
+                    isPasswordSubmitting
+                "
+                @click="resetPasswordFields"
+              >
+                重設
+              </AppButton>
+
+              <AppButton
+                type="primary"
+                native-type="submit"
+                :loading="
+                  isPasswordSubmitting ||
+                    updatePasswordMutation.isLoading.value
+                "
+                :disabled="!passwordMeta.dirty"
+              >
+                修改密碼
+              </AppButton>
+            </div>
+          </el-form>
+        </div>
+      </AppCard>
+
       <!-- API 已完成但沒有資料 -->
       <AppCard
         v-else
@@ -171,6 +261,7 @@ import { ElMessageBox } from 'element-plus'
 import {
   useProfileQuery,
   useUpdateAvatarMutation,
+  useUpdatePasswordMutation,
   useUpdateProfileMutation,
 } from '@/queries/profile'
 import { useSnackbarStore } from '@/stores/snackbar'
@@ -191,6 +282,7 @@ const isReloading = ref(false)
 
 const updateProfileMutation = useUpdateProfileMutation()
 const updateAvatarMutation = useUpdateAvatarMutation()
+const updatePasswordMutation = useUpdatePasswordMutation()
 
 const profileSchema = yup.object({
   nickname: yup
@@ -400,6 +492,79 @@ onBeforeRouteLeave(async () => {
     return false
   }
 })
+
+const passwordSchema = yup.object({
+  currentPassword: yup
+    .string()
+    .required('請輸入目前密碼'),
+
+  newPassword: yup
+    .string()
+    .required('請輸入新密碼')
+    .min(4, '新密碼至少需要 4 個字')
+    .max(20, '新密碼最多 20 個字'),
+
+  confirmPassword: yup
+    .string()
+    .required('請再次輸入新密碼')
+    .oneOf(
+      [yup.ref('newPassword')],
+      '兩次輸入的密碼不一致',
+    ),
+})
+
+const {
+  defineField: definePasswordField,
+  errors: passwordErrors,
+  handleSubmit: handlePasswordSubmit,
+  isSubmitting: isPasswordSubmitting,
+  resetForm: resetPasswordForm,
+  meta: passwordMeta,
+} = useForm({
+  validationSchema: passwordSchema,
+
+  initialValues: {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  },
+})
+
+const [currentPassword] = definePasswordField('currentPassword')
+const [newPassword] = definePasswordField('newPassword')
+const [confirmPassword] = definePasswordField('confirmPassword')
+
+const submitPassword = handlePasswordSubmit(
+  async values => {
+    try {
+      await updatePasswordMutation.mutateAsync({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      })
+
+      resetPasswordForm()
+
+      snackbar.add({
+        text: '密碼修改成功',
+        color: 'success',
+      })
+    } catch (error) {
+      snackbar.add({
+        text: getApiErrorMessage(error),
+        color: 'error',
+      })
+    }
+  },
+)
+
+function resetPasswordFields(): void {
+  resetPasswordForm()
+
+  snackbar.add({
+    text: '密碼欄位已清除',
+    color: 'info',
+  })
+}
 </script>
 
 <route lang="yaml">
@@ -495,6 +660,55 @@ meta:
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.password-card {
+  margin-top: 24px;
+}
+
+.password-section {
+  padding: 32px 40px;
+}
+
+.password-section__header {
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+
+  h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 20px;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+.password-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .password-section {
+    padding: 24px 20px;
+  }
+
+  .password-actions {
+    flex-direction: column-reverse;
+
+    :deep(.el-button) {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
 }
 
 @media (max-width: 768px) {

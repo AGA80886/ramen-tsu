@@ -15,3 +15,8 @@ export interface UpdateProfilePayload {
   nickname?: string
   email?: string
 }
+
+export interface UpdatePasswordPayload {
+  currentPassword: string
+  newPassword: string
+}
