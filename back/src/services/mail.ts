@@ -9,7 +9,7 @@ export async function sendVerificationEmail({
 }: SendVerificationEmailOptions): Promise<void> {
   const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000'
 
-  const verificationUrl = `${frontendUrl}/verify-email?token=${encodeURIComponent(token)}`
+  const verificationUrl = `${frontendUrl}/#/verify-email?token=${encodeURIComponent(token)}`
 
   console.log('\n========================================')
   console.log('📧 Mock Email Verification')
