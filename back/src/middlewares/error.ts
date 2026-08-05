@@ -155,6 +155,34 @@ export default async (
         })
         return
 
+      case 'EMAIL_REQUIRED':
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: '請先設定 Email',
+        })
+        return
+
+      case 'EMAIL_ALREADY_VERIFIED':
+        res.status(StatusCodes.CONFLICT).json({
+          success: false,
+          message: 'Email 已完成驗證',
+        })
+        return
+
+      case 'EMAIL_VERIFICATION_TOKEN_INVALID':
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: 'Email 驗證連結無效',
+        })
+        return
+
+      case 'EMAIL_VERIFICATION_TOKEN_EXPIRED':
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: 'Email 驗證連結已過期',
+        })
+        return
+
       default:
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,
