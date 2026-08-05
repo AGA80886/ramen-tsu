@@ -111,6 +111,66 @@
                 />
               </el-form-item>
 
+              <div class="email-verification">
+                <div class="email-verification__status">
+                  <span class="email-verification__label">
+                    Email 驗證狀態
+                  </span>
+
+                  <el-tag
+                    v-if="profile.emailVerified"
+                    type="success"
+                    effect="light"
+                  >
+                    已驗證
+                  </el-tag>
+
+                  <el-tag
+                    v-else
+                    type="warning"
+                    effect="light"
+                  >
+                    未驗證
+                  </el-tag>
+                </div>
+
+                <p
+                  v-if="
+                    profile.emailVerified &&
+                      profile.emailVerifiedAt
+                  "
+                  class="email-verification__time"
+                >
+                  驗證時間：
+                  {{ formatDate(profile.emailVerifiedAt) }}
+                </p>
+
+                <div
+                  v-else-if="!profile.emailVerified"
+                  class="email-verification__action"
+                >
+                  <p>
+                    驗證 Email 後，可提高帳號安全性並使用後續通知功能。
+                  </p>
+
+                  <AppButton
+                    v-if="!profile.emailVerified"
+                    type="primary"
+                    plain
+                    native-type="button"
+                    :loading="
+                      requestEmailVerificationMutation.isLoading.value
+                    "
+                    :disabled="
+                      requestEmailVerificationMutation.isLoading.value
+                    "
+                    @click="requestVerificationEmail"
+                  >
+                    寄送驗證信
+                  </AppButton>
+                </div>
+              </div>
+
               <el-form-item label="會員角色">
                 <el-input
                   :model-value="profile.role === 'admin' ? '管理員' : '一般會員'"
@@ -260,6 +320,7 @@ import { ElMessageBox } from 'element-plus'
 
 import {
   useProfileQuery,
+  useRequestEmailVerificationMutation,
   useUpdateAvatarMutation,
   useUpdatePasswordMutation,
   useUpdateProfileMutation,
@@ -283,6 +344,8 @@ const isReloading = ref(false)
 const updateProfileMutation = useUpdateProfileMutation()
 const updateAvatarMutation = useUpdateAvatarMutation()
 const updatePasswordMutation = useUpdatePasswordMutation()
+const requestEmailVerificationMutation =
+  useRequestEmailVerificationMutation()
 
 const profileSchema = yup.object({
   nickname: yup
@@ -357,8 +420,20 @@ const isProfileChanged = computed(() => {
   )
 })
 
-function formatDate(value: string): string {
-  return new Date(value).toLocaleString('zh-TW')
+function formatDate(
+  value: string | null | undefined,
+): string {
+  if (!value) {
+    return '尚未設定'
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return '日期格式錯誤'
+  }
+
+  return date.toLocaleString('zh-TW')
 }
 
 function resetProfileForm(): void {
@@ -396,6 +471,27 @@ async function reloadProfile(): Promise<void> {
     })
   } finally {
     isReloading.value = false
+  }
+}
+
+async function requestVerificationEmail(): Promise<void> {
+  if (requestEmailVerificationMutation.isLoading.value) {
+    return
+  }
+
+  try {
+    const response =
+      await requestEmailVerificationMutation.mutateAsync()
+
+    snackbar.add({
+      text: response.data.message || '驗證信已寄出',
+      color: 'success',
+    })
+  } catch (error) {
+    snackbar.add({
+      text: getApiErrorMessage(error),
+      color: 'error',
+    })
   }
 }
 
@@ -565,6 +661,8 @@ function resetPasswordFields(): void {
     color: 'info',
   })
 }
+
+
 </script>
 
 <route lang="yaml">
@@ -656,6 +754,48 @@ meta:
   padding: 40px;
 }
 
+.email-verification {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--el-fill-color-light);
+}
+
+.email-verification__status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.email-verification__label {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.email-verification__time {
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.email-verification__action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+
 .state-actions {
   display: flex;
   justify-content: center;
@@ -733,5 +873,15 @@ meta:
       width: 100%;
     }
   }
+
+  .email-verification__action {
+  align-items: stretch;
+  flex-direction: column;
+
+  :deep(.el-button) {
+    width: 100%;
+    margin-left: 0;
+  }
+}
 }
 </style>
