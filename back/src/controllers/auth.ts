@@ -253,3 +253,35 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     message: '密碼重設成功',
   })
 }
+
+const validateResetPasswordTokenSchema = yup.object({
+  token: yup.string().typeError('資料格式錯誤').trim().required('缺少重設密碼 Token'),
+})
+
+export const validateResetPasswordToken = async (req: Request, res: Response): Promise<void> => {
+  const body = await validateResetPasswordTokenSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  })
+
+  const tokenHash = hashToken(body.token)
+
+  const resetToken = await PasswordResetToken.findOne({
+    tokenHash,
+  })
+
+  if (!resetToken) {
+    throw new Error('PASSWORD_RESET_TOKEN_INVALID')
+  }
+
+  if (resetToken.expiresAt.getTime() <= Date.now()) {
+    await resetToken.deleteOne()
+
+    throw new Error('PASSWORD_RESET_TOKEN_EXPIRED')
+  }
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '重設密碼 Token 有效',
+  })
+}
