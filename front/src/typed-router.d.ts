@@ -52,6 +52,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/checkout': RouteRecordInfo<
+      '/checkout',
+      '/checkout',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/dev/components': RouteRecordInfo<
       '/dev/components',
       '/dev/components',
@@ -154,6 +161,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/admin/product.vue': {
       routes:
         | '/admin/product'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/checkout.vue': {
+      routes:
+        | '/checkout'
       views:
         | never
       pathParamNames:

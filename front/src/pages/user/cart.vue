@@ -178,9 +178,15 @@
 
                 <AppButton
                   class="summary-button"
-                  disabled
+                  type="primary"
+                  :disabled="
+                    isMutatingCart ||
+                      invalidItemCount > 0 ||
+                      validCartItems.length === 0
+                  "
+                  @click="goToCheckout"
                 >
-                  前往結帳（下一階段）
+                  前往結帳
                 </AppButton>
               </div>
 
@@ -364,6 +370,18 @@ async function removeItem(
 
 async function goShopping(): Promise<void> {
   await router.push('/')
+}
+
+async function goToCheckout(): Promise<void> {
+  if (
+    isMutatingCart.value ||
+    invalidItemCount.value > 0 ||
+    validCartItems.value.length === 0
+  ) {
+    return
+  }
+
+  await router.push('/checkout')
 }
 </script>
 
