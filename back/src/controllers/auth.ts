@@ -5,7 +5,9 @@ import * as yup from 'yup'
 import validator from 'validator'
 import { StatusCodes } from 'http-status-codes'
 import jsonwebtoken from 'jsonwebtoken'
-import { random, cookieOptions, hash } from '../utils/token'
+import { random, cookieOptions, hash, createRandomToken, hashToken } from '../utils/token'
+import PasswordResetToken from '../models/passwordResetToken'
+import { sendPasswordResetEmail } from '../services/mail'
 
 export const register = async (req: Request, res: Response) => {
   // 先對收到的 req.body 進行格式驗證後才對資料做處理
@@ -122,4 +124,63 @@ export const logout = async (req: Request, res: Response) => {
       message: '',
       result: {},
     })
+}
+
+const forgotPasswordSchema = yup.object({
+  email: yup
+    .string()
+    .typeError('資料格式錯誤')
+    .trim()
+    .lowercase()
+    .required('Email 必填')
+    .test('isEmail', 'Email 格式錯誤', (value) => validator.isEmail(value)),
+})
+
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  const body = await forgotPasswordSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  })
+
+  const successResponse = {
+    success: true,
+    message: '如果此 Email 已註冊，將收到密碼重設連結',
+  }
+
+  const user = await User.findOne({
+    email: body.email,
+  })
+
+  if (!user) {
+    res.status(StatusCodes.OK).json(successResponse)
+    return
+  }
+
+  await PasswordResetToken.deleteMany({
+    user: user._id,
+  })
+
+  const rawToken = createRandomToken()
+  const tokenHash = hashToken(rawToken)
+
+  await PasswordResetToken.create({
+    user: user._id,
+    tokenHash,
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+  })
+
+  try {
+    await sendPasswordResetEmail({
+      email: user.email!,
+      token: rawToken,
+    })
+  } catch (error) {
+    await PasswordResetToken.deleteOne({
+      tokenHash,
+    })
+
+    throw error
+  }
+
+  res.status(StatusCodes.OK).json(successResponse)
 }

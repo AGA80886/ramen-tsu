@@ -183,6 +183,13 @@ export default async (
         })
         return
 
+      case 'PASSWORD_RESET_EMAIL_SEND_FAILED':
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: '密碼重設信寄送失敗',
+        })
+        return
+
       default:
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,
