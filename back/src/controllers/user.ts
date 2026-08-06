@@ -253,6 +253,7 @@ export const requestEmailVerification = async (req: Request, res: Response): Pro
     message: '驗證信已寄出',
   })
 }
+
 const verifyEmailSchema = yup.object({
   token: yup.string().trim().required('缺少驗證 Token'),
 })
@@ -299,12 +300,6 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
   user.emailVerifiedAt = new Date()
 
   await user.save()
-
-  console.log('Email verification saved:', {
-    userId: user._id.toString(),
-    emailVerified: user.emailVerified,
-    emailVerifiedAt: user.emailVerifiedAt,
-  })
 
   await EmailVerificationToken.deleteMany({
     user: user._id,
