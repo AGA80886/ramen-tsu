@@ -615,6 +615,5 @@ function handlePageChange(page: number, size: number) {
 
 <route lang="yaml">
 meta:
-  layout: default
   title: 共用 UI 元件
 </route>

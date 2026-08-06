@@ -16,14 +16,25 @@ export const useCreateOrderMutation = defineMutation(() => {
   const queryCache = useQueryCache()
 
   return useMutation({
-    mutation: () => orderService.createOrder(),
+    mutation: async () => {
+      const { data } = await orderService.createOrder()
 
-    onSuccess: () => {
+      return data.result
+    },
+
+    onSuccess: async () => {
+      // Header 購物車數量歸零
       user.cart = 0
 
-      queryCache.invalidateQueries({
-        key: ['order'],
-      })
+      // 重新取得購物車資料
+      await Promise.all([
+        queryCache.invalidateQueries({
+          key: ['cart'],
+        }),
+        queryCache.invalidateQueries({
+          key: ['order'],
+        }),
+      ])
     },
   })
 })
@@ -55,3 +66,5 @@ export const useAdminOrdersQuery = defineQuery(() => {
     staleTime: STALE_TIME,
   })
 })
+
+

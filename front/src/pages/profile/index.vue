@@ -667,7 +667,6 @@ function resetPasswordFields(): void {
 
 <route lang="yaml">
 meta:
-  layout: default
   access: authenticated
   title: 會員中心
 </route>

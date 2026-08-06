@@ -8,6 +8,10 @@ export interface CartForm {
 
 export interface ICartItem {
   _id: string
-  product: IProduct
+  product: IProduct | null
   quantity: number
+}
+
+export type ValidCartItem = ICartItem & {
+  product: IProduct
 }
