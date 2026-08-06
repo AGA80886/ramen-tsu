@@ -20,3 +20,13 @@ export interface LoginResponse {
 export interface ForgotPasswordPayload {
   email: string
 }
+
+export interface ResetPasswordPayload {
+  token: string
+  password: string
+  confirmPassword: string
+}
+
+export interface ValidateResetPasswordTokenPayload {
+  token: string
+}

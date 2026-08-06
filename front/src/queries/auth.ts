@@ -1,7 +1,9 @@
 import type {
-  ForgotPasswordPayload,
   LoginForm,
   RegisterForm,
+  ForgotPasswordPayload,
+  ResetPasswordPayload,
+  ValidateResetPasswordTokenPayload,
 } from '@/types/auth'
 
 import {
@@ -51,3 +53,18 @@ export const useForgotPasswordMutation = defineMutation(() =>
       auth.forgotPassword(data),
   }),
 )
+
+export const useResetPasswordMutation = defineMutation(() =>
+  useMutation({
+    mutation: (data: ResetPasswordPayload) =>
+      auth.resetPassword(data),
+  }),
+)
+export const useValidateResetPasswordTokenMutation =
+  defineMutation(() =>
+    useMutation({
+      mutation: (
+        data: ValidateResetPasswordTokenPayload,
+      ) => auth.validateResetPasswordToken(data),
+    }),
+  )
