@@ -31,6 +31,14 @@
             :prefix-icon="Lock"
           />
         </el-form-item>
+        <div class="login-options">
+          <RouterLink
+            to="/forgot-password"
+            class="forgot-password-link"
+          >
+            忘記密碼？
+          </RouterLink>
+        </div>
         <el-button
           class="submit-button"
           type="primary"
@@ -48,7 +56,7 @@
 import validator from 'validator'
 import { Lock, User } from '@element-plus/icons-vue'
 import { useForm } from 'vee-validate'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import * as yup from 'yup'
 import { useLoginMutation } from '@/queries/auth'
 import { useSnackbarStore } from '@/stores/snackbar'
@@ -73,10 +81,41 @@ const submit = handleSubmit(async values => {
 </script>
 
 <style scoped>
-.auth-page { display: grid; min-height: calc(100vh - 100px); place-items: center; }
-.auth-card { width: min(460px, 100%); }
-h1 { margin: 0; text-align: center; }
-.submit-button { width: 100%; }
+.auth-page {
+  display: grid;
+  min-height: calc(100vh - 100px);
+  place-items: center;
+}
+
+.auth-card {
+  width: min(460px, 100%);
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+}
+
+.login-options {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -6px;
+  margin-bottom: 16px;
+}
+
+.forgot-password-link {
+  color: var(--el-color-primary);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.submit-button {
+  width: 100%;
+}
 </style>
 
 <route lang="yaml">
