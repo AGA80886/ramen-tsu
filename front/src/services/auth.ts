@@ -6,6 +6,8 @@ import type {
   LoginResponse,
   RegisterForm,
   ForgotPasswordPayload,
+  ResetPasswordPayload,
+  ValidateResetPasswordTokenPayload,
 } from '@/types/auth'
 
 import { apiAuth, refreshAccessToken } from '@/services/api'
@@ -36,4 +38,19 @@ export function forgotPassword(
   data: ForgotPasswordPayload,
 ): Promise<AxiosResponse<ApiMessageResponse>> {
   return api.post('/auth/forgot-password', data)
+}
+
+export function resetPassword(
+  data: ResetPasswordPayload,
+): Promise<AxiosResponse<ApiMessageResponse>> {
+  return api.post('/auth/reset-password', data)
+}
+
+export function validateResetPasswordToken(
+  data: ValidateResetPasswordTokenPayload,
+): Promise<AxiosResponse<ApiMessageResponse>> {
+  return api.post(
+    '/auth/reset-password/validate',
+    data,
+  )
 }
