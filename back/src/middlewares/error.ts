@@ -190,6 +190,20 @@ export default async (
         })
         return
 
+      case 'PASSWORD_RESET_TOKEN_INVALID':
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: '重設密碼連結無效',
+        })
+        return
+
+      case 'PASSWORD_RESET_TOKEN_EXPIRED':
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: '重設密碼連結已過期',
+        })
+        return
+
       default:
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,
