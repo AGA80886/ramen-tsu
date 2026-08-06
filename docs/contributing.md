@@ -444,7 +444,6 @@ src/pages/product/[id].vue
 ```vue
 <route lang="yaml">
 meta:
-  layout: default
   title: 商品詳細資料
 </route>
 ```
