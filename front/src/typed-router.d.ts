@@ -66,6 +66,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/forgot-password': RouteRecordInfo<
+      '/forgot-password',
+      '/forgot-password',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/login': RouteRecordInfo<
       '/login',
       '/login',
@@ -149,6 +156,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/forbidden.vue': {
       routes:
         | '/forbidden'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/forgot-password.vue': {
+      routes:
+        | '/forgot-password'
       views:
         | never
       pathParamNames:
