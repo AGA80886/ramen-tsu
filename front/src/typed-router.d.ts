@@ -108,6 +108,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/user/cart': RouteRecordInfo<
+      '/user/cart',
+      '/user/cart',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/verify-email': RouteRecordInfo<
       '/verify-email',
       '/verify-email',
@@ -211,6 +218,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/reset-password.vue': {
       routes:
         | '/reset-password'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/cart.vue': {
+      routes:
+        | '/user/cart'
       views:
         | never
       pathParamNames:

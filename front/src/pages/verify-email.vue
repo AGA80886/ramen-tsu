@@ -124,6 +124,5 @@ async function goToProfile(): Promise<void> {
 
 <route lang="yaml">
 meta:
-  layout: default
   title: Email 驗證
 </route>

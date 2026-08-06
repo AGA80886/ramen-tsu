@@ -481,7 +481,6 @@ src/pages/dev/components.vue
 ```vue
 <route lang="yaml">
 meta:
-  layout: default
   title: 商品頁面
 </route>
 ```

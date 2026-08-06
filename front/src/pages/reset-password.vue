@@ -259,7 +259,6 @@ onMounted(async () => {
 
 <route lang="yaml">
 meta:
-  layout: default
   title: 重設密碼
 </route>
 
