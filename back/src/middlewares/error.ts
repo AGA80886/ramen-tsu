@@ -142,16 +142,23 @@ export default async (
         return
 
       case 'CART EMPTY':
-        res.status(StatusCodes.NOT_FOUND).json({
+        res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
           message: '購物車是空的',
         })
         return
 
       case 'CART SELL':
-        res.status(StatusCodes.NOT_FOUND).json({
+        res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
           message: '購物車包含下架商品',
+        })
+        return
+
+      case 'CART PRODUCT NOT FOUND':
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: '購物車包含不存在的商品',
         })
         return
 
