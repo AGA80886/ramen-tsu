@@ -218,6 +218,13 @@ export default async (
         })
         return
 
+      case 'ARTICLE NOT FOUND':
+        res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: '找不到文章',
+        })
+        return
+
       default:
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,

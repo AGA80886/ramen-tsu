@@ -7,6 +7,7 @@ import routeAuth from './routes/auth'
 import routeProduct from './routes/product'
 import routeUser from './routes/user'
 import routeOrder from './routes/order'
+import routerArticle from './routes/article'
 import middlewareError from './middlewares/error'
 import './configs/passport'
 
@@ -48,7 +49,7 @@ app.use('/auth', routeAuth)
 app.use('/product', routeProduct)
 app.use('/user', routeUser)
 app.use('/order', routeOrder)
-
+app.use('/article', routerArticle)
 app.use(middlewareError)
 
 async function startServer(): Promise<void> {
