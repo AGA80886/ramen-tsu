@@ -122,6 +122,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/user/orders': RouteRecordInfo<
+      '/user/orders',
+      '/user/orders',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/verify-email': RouteRecordInfo<
       '/verify-email',
       '/verify-email',
@@ -241,6 +248,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/user/cart.vue': {
       routes:
         | '/user/cart'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/orders.vue': {
+      routes:
+        | '/user/orders'
       views:
         | never
       pathParamNames:
