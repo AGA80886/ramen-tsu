@@ -1,4 +1,5 @@
 import { Schema, model, type HydratedDocument, Types } from 'mongoose'
+import cloudinary from '../configs/cloudinary'
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled'
 
@@ -8,6 +9,7 @@ export interface IOrderItem {
   product: Types.ObjectId
   name: string
   image: string
+  imageUrl?: string
   price: number
   quantity: number
   subtotal: number
@@ -65,8 +67,14 @@ const orderItemSchema = new Schema<IOrderItem>(
   },
   {
     _id: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 )
+
+orderItemSchema.virtual('imageUrl').get(function () {
+  return cloudinary.url(this.image)
+})
 
 const schema = new Schema<IOrder>(
   {
@@ -112,6 +120,8 @@ const schema = new Schema<IOrder>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 )
 

@@ -17,6 +17,7 @@ export interface IOrderItem {
   price: number
   quantity: number
   subtotal: number
+  imageUrl?: string
 }
 
 export interface IOrderUser {
