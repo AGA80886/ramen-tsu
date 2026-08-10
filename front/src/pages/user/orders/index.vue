@@ -163,6 +163,16 @@
                 {{ formatCurrency(order.totalPrice) }}
               </strong>
             </div>
+
+            <div class="order-detail__actions">
+              <AppButton
+                type="primary"
+                plain
+                @click="goToOrderDetail(order._id)"
+              >
+                查看詳情
+              </AppButton>
+            </div>
           </div>
         </el-collapse-item>
       </el-collapse>
@@ -310,6 +320,14 @@ async function reloadOrders(): Promise<void> {
 async function goShopping(): Promise<void> {
   await router.push('/')
 }
+
+async function goToOrderDetail(
+  orderId: string,
+): Promise<void> {
+  await router.push(
+    `/user/orders/${orderId}`,
+  )
+}
 </script>
 
 <route lang="yaml">
@@ -453,6 +471,12 @@ meta:
       font-size: 1.125rem;
     }
   }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
 }
 
 .order-item {
@@ -549,6 +573,13 @@ meta:
     p {
       grid-template-columns: 1fr;
       gap: 2px;
+    }
+  }
+
+  .order-detail__actions {
+    :deep(.el-button) {
+      width: 100%;
+      margin-left: 0;
     }
   }
 
