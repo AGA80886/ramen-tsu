@@ -8,6 +8,7 @@ import {
 
 import * as orderService from '@/services/order'
 import { useUserStore } from '@/stores/user'
+import type { OrderStatus } from '@/types/order'
 
 const STALE_TIME = 1000 * 60 * 5
 
@@ -67,4 +68,32 @@ export const useAdminOrdersQuery = defineQuery(() => {
   })
 })
 
+export const useUpdateOrderStatusMutation =
+  defineMutation(() => {
+    const queryCache = useQueryCache()
+
+    return useMutation({
+      mutation: async ({
+        id,
+        status,
+      }: {
+        id: string
+        status: OrderStatus
+      }) => {
+        const { data } =
+          await orderService.updateOrderStatus(
+            id,
+            status,
+          )
+
+        return data.result
+      },
+
+      onSuccess: async () => {
+        await queryCache.invalidateQueries({
+          key: ['order'],
+        })
+      },
+    })
+  })
 

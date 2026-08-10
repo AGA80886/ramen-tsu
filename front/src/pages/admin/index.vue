@@ -5,7 +5,8 @@
 <route lang="yaml">
 meta:
   layout: admin
+  access: authenticated
+  roles:
+    - admin
   title: 管理
-  login: login-only
-  admin: true
 </route>

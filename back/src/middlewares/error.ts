@@ -141,6 +141,13 @@ export default async (
         })
         return
 
+      case 'ORDER NOT FOUND':
+        res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: '找不到訂單',
+        })
+        return
+
       case 'CART EMPTY':
         res.status(StatusCodes.BAD_REQUEST).json({
           success: false,

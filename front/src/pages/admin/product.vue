@@ -299,7 +299,8 @@ const submit = handleSubmit(async values => {
 <route lang="yaml">
 meta:
   layout: admin
+  access: authenticated
+  roles:
+    - admin
   title: 商品管理
-  login: login-only
-  admin: true
 </route>

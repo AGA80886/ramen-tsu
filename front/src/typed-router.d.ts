@@ -45,6 +45,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/admin/orders': RouteRecordInfo<
+      '/admin/orders',
+      '/admin/orders',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/admin/product': RouteRecordInfo<
       '/admin/product',
       '/admin/product',
@@ -115,6 +122,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/shop': RouteRecordInfo<
+      '/shop',
+      '/shop',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/user/cart': RouteRecordInfo<
       '/user/cart',
       '/user/cart',
@@ -167,6 +181,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/admin/index.vue': {
       routes:
         | '/admin/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/orders.vue': {
+      routes:
+        | '/admin/orders'
       views:
         | never
       pathParamNames:
@@ -247,6 +269,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/reset-password.vue': {
       routes:
         | '/reset-password'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/shop.vue': {
+      routes:
+        | '/shop'
       views:
         | never
       pathParamNames:
