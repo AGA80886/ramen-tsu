@@ -122,11 +122,18 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/user/orders': RouteRecordInfo<
-      '/user/orders',
+    '/user/orders/': RouteRecordInfo<
+      '/user/orders/',
       '/user/orders',
       Record<never, never>,
       Record<never, never>,
+      | never
+    >,
+    '/user/orders/[id]': RouteRecordInfo<
+      '/user/orders/[id]',
+      '/user/orders/:id',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
       | never
     >,
     '/verify-email': RouteRecordInfo<
@@ -253,13 +260,21 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/user/orders.vue': {
+    'src/pages/user/orders/index.vue': {
       routes:
-        | '/user/orders'
+        | '/user/orders/'
       views:
         | never
       pathParamNames:
         | never
+    }
+    'src/pages/user/orders/[id].vue': {
+      routes:
+        | '/user/orders/[id]'
+      views:
+        | never
+      pathParamNames:
+        | 'id'
     }
     'src/pages/verify-email.vue': {
       routes:
