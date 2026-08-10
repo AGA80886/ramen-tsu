@@ -155,12 +155,15 @@ export const cart = async (req: Request, res: Response) => {
   })
 }
 
-export const getCart = async (req: Request, res: Response) => {
-  const user = await User.findById(req.user!.id).populate('cart.product')
+export const getCart = async (req: Request, res: Response): Promise<void> => {
+  const user = await User.findById(req.user!._id)
+    .populate('cart.product')
+    .orFail(new Error('USER_NOT_FOUND'))
+
   res.status(StatusCodes.OK).json({
     success: true,
     message: '',
-    result: user!.cart,
+    result: user.cart,
   })
 }
 
