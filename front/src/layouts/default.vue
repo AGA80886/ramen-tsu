@@ -292,7 +292,7 @@
           </el-menu-item>
 
           <el-menu-item index="/shop">
-            <span>線上商城</span>
+            <span>即食拉麵商城</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
