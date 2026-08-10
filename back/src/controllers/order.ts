@@ -106,3 +106,26 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     result,
   })
 }
+
+export const updateStatus = async (req: Request, res: Response): Promise<void> => {
+  const result = await Order.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: req.body.status,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+
+  if (!result) {
+    throw new Error('ORDER NOT FOUND')
+  }
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '訂單狀態更新成功',
+    result,
+  })
+}
