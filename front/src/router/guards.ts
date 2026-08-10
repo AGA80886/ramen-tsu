@@ -78,16 +78,42 @@ export function setupRouterGuards(router: Router): void {
       }
     }
 
-    /**
-     * 角色限定頁面。
-     *
-     * 使用者角色必須存在於路由允許的 roles 中。
-     */
-    if (!hasRequiredRole(to.meta.roles, user.role)) {
-      return {
-        path: '/forbidden',
-      }
-    }
+    if (requiresAuthentication && !user.isLoggedIn) {
+  return {
+    path: '/login',
+    query: {
+      redirect: to.fullPath,
+    },
+  }
+}
+
+const isAdminRoute =
+  to.path === '/admin' ||
+  to.path.startsWith('/admin/')
+
+if (
+  isAdminRoute &&
+  user.isLoggedIn &&
+  user.role !== 'admin'
+) {
+  return {
+    path: '/',
+    query: {
+      notice: 'admin-only',
+    },
+  }
+}
+
+if (!hasRequiredRole(to.meta.roles, user.role)) {
+  return {
+    path: '/',
+    query: {
+      notice: 'admin-only',
+    },
+  }
+}
+
+return true
 
     return true
   })

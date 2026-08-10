@@ -1,7 +1,7 @@
 import type { AxiosResponse } from 'axios'
 
 import type { ApiResponse } from '@/types/api'
-import type { IOrder } from '@/types/order'
+import type { IOrder , OrderStatus, } from '@/types/order'
 
 import { apiAuth } from './api'
 
@@ -18,4 +18,16 @@ Promise<AxiosResponse<ApiResponse<IOrder[]>>> {
 export function getAdminOrders():
 Promise<AxiosResponse<ApiResponse<IOrder[]>>> {
   return apiAuth.get('/order/all')
+}
+
+export function updateOrderStatus(
+  id: string,
+  status: OrderStatus,
+): Promise<AxiosResponse<ApiResponse<IOrder>>> {
+  return apiAuth.patch(
+    `/order/${id}/status`,
+    {
+      status,
+    },
+  )
 }
