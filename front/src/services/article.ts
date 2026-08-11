@@ -5,6 +5,7 @@ import type {
   IArticle,
   ICreateArticle,
   IUpdateArticle,
+  TArticleStatus,
 } from '@/types/article'
 
 import { api, apiAuth } from './api'
@@ -32,13 +33,6 @@ function buildArticleFormData(
 
   if (data.category !== undefined) {
     formData.append('category', data.category)
-  }
-
-  if (data.published !== undefined) {
-    formData.append(
-      'published',
-      data.published.toString(),
-    )
   }
 
   if (data.image) {
@@ -106,4 +100,28 @@ export function deleteArticle(
   return apiAuth.delete(
     `/article/${id}`,
   )
+}
+
+export function updateArticleStatus(
+  id: string,
+  status: Extract<
+    TArticleStatus,
+    'approved' | 'rejected'
+  >,
+): Promise<
+  AxiosResponse<ApiResponse<IArticle>>
+> {
+  return apiAuth.patch(
+    `/article/${id}/status`,
+    {
+      status,
+    },
+  )
+}
+
+export function getMyArticles():
+Promise<
+  AxiosResponse<ApiResponse<IArticle[]>>
+> {
+  return apiAuth.get('/article/me')
 }

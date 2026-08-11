@@ -3,8 +3,27 @@
     <div class="profile-page__header">
       <div>
         <h1>會員中心</h1>
-        <p>查看並更新你的個人資料與會員頭像。</p>
+        <p>
+          查看並更新你的個人資料與會員頭像。
+        </p>
       </div>
+    </div>
+
+    <div class="profile-shortcuts">
+      <AppButton
+        type="primary"
+        plain
+        @click="goToMyArticles"
+      >
+        我的文章
+      </AppButton>
+
+      <AppButton
+        type="primary"
+        @click="goToCreateArticle"
+      >
+        發表文章
+      </AppButton>
     </div>
 
     <AppLoading
@@ -313,6 +332,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { onBeforeRouteLeave } from 'vue-router'
@@ -329,6 +349,15 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { getApiErrorMessage } from '@/utils/api-error'
 
 const snackbar = useSnackbarStore()
+
+const router = useRouter()
+function goToMyArticles(): void {
+  router.push('/user/articles')
+}
+
+function goToCreateArticle(): void {
+  router.push('/articles/create')
+}
 
 const avatarInput = ref<HTMLInputElement | null>(null)
 
@@ -665,12 +694,6 @@ function resetPasswordFields(): void {
 
 </script>
 
-<route lang="yaml">
-meta:
-  access: authenticated
-  title: 會員中心
-</route>
-
 <style scoped lang="scss">
 .profile-page {
   width: min(100%, 960px);
@@ -835,6 +858,17 @@ meta:
   margin-top: 24px;
 }
 
+.profile-shortcuts {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+
+  :deep(.el-button) {
+    margin-left: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .password-section {
     padding: 24px 20px;
@@ -882,5 +916,19 @@ meta:
     margin-left: 0;
   }
 }
+
+  .profile-shortcuts {
+    flex-direction: column;
+
+    :deep(.el-button) {
+      width: 100%;
+    }
+  }
 }
 </style>
+
+<route lang="yaml">
+meta:
+  access: authenticated
+  title: 會員中心
+</route>

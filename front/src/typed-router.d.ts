@@ -66,6 +66,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/articles/': RouteRecordInfo<
+      '/articles/',
+      '/articles',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/articles/create': RouteRecordInfo<
+      '/articles/create',
+      '/articles/create',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/checkout': RouteRecordInfo<
       '/checkout',
       '/checkout',
@@ -134,6 +148,20 @@ declare module 'vue-router/auto-routes' {
       '/shop',
       Record<never, never>,
       Record<never, never>,
+      | never
+    >,
+    '/user/articles/': RouteRecordInfo<
+      '/user/articles/',
+      '/user/articles',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/articles/[id]/edit': RouteRecordInfo<
+      '/user/articles/[id]/edit',
+      '/user/articles/:id/edit',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
       | never
     >,
     '/user/cart': RouteRecordInfo<
@@ -217,6 +245,22 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
+    'src/pages/articles/index.vue': {
+      routes:
+        | '/articles/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/articles/create.vue': {
+      routes:
+        | '/articles/create'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
     'src/pages/checkout.vue': {
       routes:
         | '/checkout'
@@ -292,6 +336,22 @@ declare module 'vue-router/auto-routes' {
     'src/pages/shop.vue': {
       routes:
         | '/shop'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/articles/index.vue': {
+      routes:
+        | '/user/articles/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/articles/[id]/edit.vue': {
+      routes:
+        | '/user/articles/[id]/edit'
       views:
         | never
       pathParamNames:

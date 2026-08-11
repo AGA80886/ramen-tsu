@@ -29,6 +29,25 @@
             :ellipsis="false"
             router
           >
+            <el-menu-item index="/">
+              <el-icon>
+                <HomeFilled />
+              </el-icon>
+              <span>回首頁</span>
+            </el-menu-item>
+
+            <el-menu-item index="/articles">
+              <span>拉麵論壇</span>
+            </el-menu-item>
+
+            <el-menu-item index="/ramen-map">
+              <span>拉麵地圖</span>
+            </el-menu-item>
+
+            <el-menu-item index="/shop">
+              <span>拉麵商城</span>
+            </el-menu-item>
+
             <el-menu-item
               v-if="user.isAdmin"
               index="/admin"
@@ -156,20 +175,16 @@
                   回首頁
                 </el-dropdown-item>
 
-                <el-dropdown-item command="/ramen-guide">
-                  日式拉麵大全
+                <el-dropdown-item command="/articles">
+                  拉麵論壇
                 </el-dropdown-item>
 
                 <el-dropdown-item command="/ramen-map">
-                  台灣拉麵地圖
-                </el-dropdown-item>
-
-                <el-dropdown-item command="/instant-ramen">
-                  日式即食拉麵
+                  拉麵地圖
                 </el-dropdown-item>
 
                 <el-dropdown-item command="/shop">
-                  線上商城
+                  拉麵商城
                 </el-dropdown-item>
 
                 <el-dropdown-item
@@ -261,42 +276,8 @@
       </div>
     </el-header>
 
-    <!-- Header 下方：Sidebar + 主內容 -->
+    <!-- Header 下方：主內容 -->
     <el-container class="body-layout">
-      <el-aside
-        class="site-sidebar"
-        width="240px"
-      >
-        <el-menu
-          class="sidebar-menu"
-          :default-active="route.path"
-          router
-        >
-          <el-menu-item index="/">
-            <el-icon>
-              <HomeFilled />
-            </el-icon>
-            <span>回首頁</span>
-          </el-menu-item>
-
-          <el-menu-item index="/ramen-guide">
-            <span>日式拉麵大全</span>
-          </el-menu-item>
-
-          <el-menu-item index="/ramen-map">
-            <span>台灣拉麵地圖</span>
-          </el-menu-item>
-
-          <el-menu-item index="/instant-ramen">
-            <span>日式即食拉麵</span>
-          </el-menu-item>
-
-          <el-menu-item index="/shop">
-            <span>即食拉麵商城</span>
-          </el-menu-item>
-        </el-menu>
-      </el-aside>
-
       <el-main class="site-main">
         <router-view :key="route.fullPath" />
       </el-main>
@@ -446,8 +427,6 @@ async function goToProfile(): Promise<void> {
   font-size: 14px;
 }
 
-/* 桌面版 Navbar */
-
 .header-actions {
   display: flex;
   align-items: center;
@@ -568,52 +547,14 @@ async function goToProfile(): Promise<void> {
   margin-left: auto;
 }
 
-/* Sidebar 與主內容 */
+/* 主內容 */
 
 .body-layout {
   min-height: calc(100vh - 100px);
 }
 
-.site-sidebar {
-  position: sticky;
-  top: 100px;
-  height: calc(100vh - 100px);
-  overflow-y: auto;
-  background-color: var(--color-surface);
-  border-right: 1px solid var(--color-border);
-}
-
-.sidebar-menu {
-  min-height: 100%;
-  padding: 16px 10px;
-  border-right: none;
-  background-color: transparent;
-}
-
-.sidebar-menu :deep(.el-menu-item) {
-  height: 48px;
-  margin: 4px 0;
-  padding: 0 16px !important;
-  border-radius: 6px;
-  color: var(--color-primary);
-  font-weight: 500;
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.sidebar-menu :deep(.el-menu-item:hover),
-.sidebar-menu :deep(.el-menu-item:focus),
-.sidebar-menu :deep(.el-menu-item.is-active) {
-  color: var(--color-primary);
-  background-color: var(--el-color-primary-light-9);
-}
-
-.sidebar-menu :deep(.el-menu-item .el-icon) {
-  color: inherit;
-}
-
 .site-main {
+  width: 100%;
   min-width: 0;
   padding: 24px;
   box-sizing: border-box;
@@ -657,7 +598,17 @@ async function goToProfile(): Promise<void> {
 
 /* 平板與手機 */
 
-@media (max-width: 1100px) {
+@media (max-width: 1400px) {
+  .desktop-actions {
+    display: none;
+  }
+
+  .mobile-actions {
+    display: flex;
+  }
+}
+
+@media (min-width: 1401px) and (max-width: 1600px) {
   .account-menu :deep(.el-menu-item) {
     padding: 0 8px;
   }
@@ -669,18 +620,6 @@ async function goToProfile(): Promise<void> {
 }
 
 @media (max-width: 900px) {
-  .desktop-actions {
-    display: none;
-  }
-
-  .mobile-actions {
-    display: flex;
-  }
-
-  .site-sidebar {
-    display: none;
-  }
-
   .body-layout {
     display: block;
   }

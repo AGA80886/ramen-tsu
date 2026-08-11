@@ -241,6 +241,13 @@ export default async (
         })
         return
 
+      case 'ARTICLE FORBIDDEN':
+        res.status(StatusCodes.FORBIDDEN).json({
+          success: false,
+          message: '無權修改此文章',
+        })
+        return
+
       default:
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,

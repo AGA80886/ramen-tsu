@@ -1,4 +1,5 @@
 import { Schema, model, type HydratedDocument, Types } from 'mongoose'
+import cloudinary from '../configs/cloudinary'
 
 export const articleCategoryOptions = [
   '公告',
@@ -12,6 +13,11 @@ export const articleCategoryOptions = [
 
 export type TArticleCategory = (typeof articleCategoryOptions)[number]
 
+// 文章狀態
+export const articleStatusOptions = ['draft', 'pending', 'approved', 'rejected'] as const
+
+export type TArticleStatus = (typeof articleStatusOptions)[number]
+
 export interface IArticle {
   title: string
   slug: string
@@ -19,7 +25,7 @@ export interface IArticle {
   content: string
   coverImage: string
   category: TArticleCategory
-  published: boolean
+  status: TArticleStatus
   author: Types.ObjectId
   createdAt: Date
   updatedAt: Date
@@ -71,10 +77,14 @@ const schema = new Schema<IArticle>(
       },
     },
 
-    published: {
-      type: Boolean,
-      required: [true, '文章發布狀態必填'],
-      default: false,
+    status: {
+      type: String,
+      required: [true, '文章狀態必填'],
+      enum: {
+        values: articleStatusOptions,
+        message: '文章狀態錯誤',
+      },
+      default: 'draft',
       index: true,
     },
 
@@ -87,17 +97,34 @@ const schema = new Schema<IArticle>(
   },
   {
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
+    id: false,
   },
 )
 
+schema.virtual('coverImageUrl').get(function () {
+  return cloudinary.url(this.coverImage)
+})
+
 schema.index({
-  published: 1,
+  status: 1,
   createdAt: -1,
 })
 
 schema.index({
   category: 1,
-  published: 1,
+  status: 1,
+  createdAt: -1,
+})
+
+schema.index({
+  author: 1,
+  status: 1,
   createdAt: -1,
 })
 

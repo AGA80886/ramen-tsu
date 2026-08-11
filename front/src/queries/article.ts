@@ -10,6 +10,7 @@ import * as articleService from '@/services/article'
 import type {
   ICreateArticle,
   IUpdateArticle,
+  TArticleStatus,
 } from '@/types/article'
 
 const STALE_TIME = 1000 * 60 * 5
@@ -119,5 +120,54 @@ export const useDeleteArticleMutation =
           key: ['article'],
         })
       },
+    })
+  })
+
+  export const useUpdateArticleStatusMutation =
+  defineMutation(() => {
+    const queryCache = useQueryCache()
+
+    return useMutation({
+      mutation: async ({
+        id,
+        status,
+      }: {
+        id: string
+        status: Extract<
+          TArticleStatus,
+          'approved' | 'rejected'
+        >
+      }) => {
+        const { data } =
+          await articleService.updateArticleStatus(
+            id,
+            status,
+          )
+
+        return data.result
+      },
+
+      onSuccess: async () => {
+        await queryCache.invalidateQueries({
+          key: ['article'],
+        })
+      },
+    })
+  })
+
+  export const useMyArticlesQuery =
+  defineQuery(() => {
+    return useQuery({
+      key: ['article', 'mine'],
+
+      query: async () => {
+        const { data } =
+          await articleService
+            .getMyArticles()
+
+        return data.result
+      },
+
+      staleTime: STALE_TIME,
     })
   })
