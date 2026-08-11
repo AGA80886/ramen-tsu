@@ -73,6 +73,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/articles/[slug]': RouteRecordInfo<
+      '/articles/[slug]',
+      '/articles/:slug',
+      { slug: ParamValue<true> },
+      { slug: ParamValue<false> },
+      | never
+    >,
     '/articles/create': RouteRecordInfo<
       '/articles/create',
       '/articles/create',
@@ -252,6 +259,14 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | never
+    }
+    'src/pages/articles/[slug].vue': {
+      routes:
+        | '/articles/[slug]'
+      views:
+        | never
+      pathParamNames:
+        | 'slug'
     }
     'src/pages/articles/create.vue': {
       routes:
