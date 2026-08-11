@@ -1,11 +1,11 @@
 import { Schema, model, type HydratedDocument, Types } from 'mongoose'
 
 export const articleCategoryOptions = [
-  '拉麵歷史',
-  '湯頭',
-  '麵條',
-  '配料',
-  '地域拉麵',
+  '公告',
+  '拉麵科普',
+  '食記分享',
+  '最新情報',
+  '議題討論',
   '即食拉麵',
   '其他',
 ] as const
