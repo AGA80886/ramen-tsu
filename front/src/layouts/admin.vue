@@ -79,6 +79,16 @@
           </template>
         </el-menu-item>
 
+        <el-menu-item index="/admin/articles">
+          <el-icon>
+            <Document />
+          </el-icon>
+
+          <template #title>
+            文章管理
+          </template>
+        </el-menu-item>
+
         <el-menu-item index="/">
           <el-icon>
             <HomeFilled />
@@ -180,6 +190,7 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowDown,
   DataBoard,
+  Document,
   Expand,
   Fold,
   Goods,
@@ -209,6 +220,7 @@ const pageTitles: Record<string, string> = {
   '/admin/products': '商品管理',
   '/admin/products/create': '新增商品',
   '/admin/orders': '訂單管理',
+  '/admin/articles': '文章管理',
 }
 
 const currentPageTitle = computed(() => {
