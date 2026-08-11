@@ -7,6 +7,12 @@ export type TArticleCategory =
   | '即食拉麵'
   | '其他'
 
+export type TArticleStatus =
+  | 'draft'
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+
 export interface IArticleAuthor {
   _id: string
   account: string
@@ -23,12 +29,10 @@ export interface IArticle {
   slug: string
   summary: string
   content: string
-
-  // MongoDB 儲存的是 Cloudinary public ID
   coverImage: string
-
+  coverImageUrl?: string
   category: TArticleCategory
-  published: boolean
+  status: TArticleStatus
   author: IArticleAuthor
   createdAt: string
   updatedAt: string
@@ -46,7 +50,6 @@ export interface ICreateArticle {
   summary: string
   content: string
   category: TArticleCategory
-  published: boolean
 
   // 使用者從電腦選擇或拖曳進來的圖片
   image?: File
@@ -64,7 +67,6 @@ export interface IUpdateArticle {
   summary?: string
   content?: string
   category?: TArticleCategory
-  published?: boolean
 
   // 有新圖片才傳
   image?: File

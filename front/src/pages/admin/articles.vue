@@ -55,18 +55,28 @@
           </el-select>
 
           <el-select
-            v-model="publishedFilter"
+            v-model="statusFilter"
             clearable
-            placeholder="發布狀態"
+            placeholder="審核狀態"
           >
-            <el-option
-              label="已發布"
-              value="published"
-            />
-
             <el-option
               label="草稿"
               value="draft"
+            />
+
+            <el-option
+              label="待審核"
+              value="pending"
+            />
+
+            <el-option
+              label="已通過"
+              value="approved"
+            />
+
+            <el-option
+              label="已拒絕"
+              value="rejected"
             />
           </el-select>
         </div>
@@ -124,18 +134,20 @@
           >
             <template #default="{ row }">
               <el-tag
-                :type="
-                  row.published
-                    ? 'success'
-                    : 'info'
-                "
+                :type="articleStatusType(row.status)"
+                effect="light"
               >
-                {{
-                  row.published
-                    ? '已發布'
-                    : '草稿'
-                }}
+                {{ articleStatusText(row.status) }}
               </el-tag>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="建立時間"
+            min-width="170"
+          >
+            <template #default="{ row }">
+              {{ formatDateTime(row.createdAt) }}
             </template>
           </el-table-column>
 
@@ -144,17 +156,47 @@
             min-width="170"
           >
             <template #default="{ row }">
-              {{ formatDate(row.updatedAt) }}
+              {{ formatDateTime(row.updatedAt) }}
             </template>
           </el-table-column>
 
           <el-table-column
             label="操作"
-            width="180"
+            width="340"
             fixed="right"
           >
             <template #default="{ row }">
               <div class="table-actions">
+                <AppButton
+                  v-if="row.status === 'pending'"
+                  type="success"
+                  plain
+                  :loading="reviewingId === row._id"
+                  @click="
+                    reviewArticle(
+                      row,
+                      'approved',
+                    )
+                  "
+                >
+                  通過
+                </AppButton>
+
+                <AppButton
+                  v-if="row.status === 'pending'"
+                  type="danger"
+                  plain
+                  :loading="reviewingId === row._id"
+                  @click="
+                    reviewArticle(
+                      row,
+                      'rejected',
+                    )
+                  "
+                >
+                  拒絕
+                </AppButton>
+
                 <AppButton
                   type="primary"
                   plain
@@ -281,14 +323,6 @@
           :max-files="1"
           max-size="2MB"
         />
-
-        <el-form-item label="發布狀態">
-          <el-switch
-            v-model="form.published"
-            active-text="發布"
-            inactive-text="草稿"
-          />
-        </el-form-item>
       </el-form>
 
       <template #footer>
@@ -322,6 +356,7 @@ import type {
   IArticle,
   ICreateArticle,
   TArticleCategory,
+  TArticleStatus,
 } from '@/types/article'
 
 import { computed, reactive, ref } from 'vue'
@@ -331,6 +366,7 @@ import {
   useCreateArticleMutation,
   useDeleteArticleMutation,
   useUpdateArticleMutation,
+  useUpdateArticleStatusMutation,
 } from '@/queries/article'
 import { useSnackbarStore } from '@/stores/snackbar'
 
@@ -343,10 +379,9 @@ type DialogMode =
   | 'create'
   | 'edit'
 
-type PublishedFilter =
+type StatusFilter =
   | ''
-  | 'published'
-  | 'draft'
+  | TArticleStatus
 
 const fileAgent = ref()
 const fileRecords = ref<FileRecord[]>([])
@@ -362,6 +397,12 @@ const {
   refetch,
 } = useAdminArticlesQuery()
 
+const updateArticleStatusMutation =
+  useUpdateArticleStatusMutation()
+
+const reviewingId =
+  ref<string | null>(null)
+
 const createArticleMutation =
   useCreateArticleMutation()
 
@@ -375,8 +416,8 @@ const search = ref('')
 const categoryFilter =
   ref<TArticleCategory | ''>('')
 
-const publishedFilter =
-  ref<PublishedFilter>('')
+const statusFilter =
+  ref<StatusFilter>('')
 
 const isReloading = ref(false)
 const dialogVisible = ref(false)
@@ -410,7 +451,6 @@ const initialForm = (): ICreateArticle => ({
   summary: '',
   content: '',
   category: '其他',
-  published: false,
 })
 
 const form = reactive<ICreateArticle>(
@@ -441,17 +481,8 @@ const filteredArticles = computed(() => {
       }
 
       if (
-        publishedFilter.value ===
-          'published' &&
-        !article.published
-      ) {
-        return false
-      }
-
-      if (
-        publishedFilter.value ===
-          'draft' &&
-        article.published
+        statusFilter.value &&
+        article.status !== statusFilter.value
       ) {
         return false
       }
@@ -493,7 +524,7 @@ function getAuthorName(
   )
 }
 
-function formatDate(
+function formatDateTime(
   value: string,
 ): string {
   return new Intl.DateTimeFormat(
@@ -504,6 +535,7 @@ function formatDate(
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     },
   ).format(new Date(value))
 }
@@ -541,13 +573,12 @@ function openEditDialog(
   dialogMode.value = 'edit'
 
   Object.assign(form, {
-    title: article.title,
-    slug: article.slug,
-    summary: article.summary,
-    content: article.content,
-    category: article.category,
-    published: article.published,
-  })
+  title: article.title,
+  slug: article.slug,
+  summary: article.summary,
+  content: article.content,
+  category: article.category,
+})
 
   fileRecords.value = []
   rawFileRecords.value = []
@@ -626,7 +657,6 @@ const data: ICreateArticle = {
   summary: form.summary.trim(),
   content: form.content.trim(),
   category: form.category,
-  published: form.published,
 }
 
 if (image) {
@@ -666,6 +696,59 @@ if (image) {
     dialogVisible.value = false
   } catch (error) {
     snackbar.addError(error)
+  }
+}
+
+async function reviewArticle(
+  article: IArticle,
+  status: 'approved' | 'rejected',
+): Promise<void> {
+  if (reviewingId.value) {
+    return
+  }
+
+  const action =
+    status === 'approved'
+      ? '通過'
+      : '拒絕'
+
+  try {
+    await ElMessageBox.confirm(
+      `確定要${action}「${article.title}」嗎？`,
+      '文章審核',
+      {
+        confirmButtonText: action,
+        cancelButtonText: '取消',
+        type:
+          status === 'approved'
+            ? 'success'
+            : 'warning',
+      },
+    )
+  } catch {
+    return
+  }
+
+  reviewingId.value = article._id
+
+  try {
+    await updateArticleStatusMutation
+      .mutateAsync({
+        id: article._id,
+        status,
+      })
+
+    snackbar.add({
+      text:
+        status === 'approved'
+          ? '文章審核通過'
+          : '文章已拒絕',
+      color: 'success',
+    })
+  } catch (error) {
+    snackbar.addError(error)
+  } finally {
+    reviewingId.value = null
   }
 }
 
@@ -720,6 +803,45 @@ Promise<void> {
   } finally {
     isReloading.value = false
   }
+}
+
+type ArticleTagType =
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'info'
+  | 'danger'
+
+function articleStatusText(
+  status: TArticleStatus,
+): string {
+  const labels: Record<
+    TArticleStatus,
+    string
+  > = {
+    draft: '草稿',
+    pending: '待審核',
+    approved: '已通過',
+    rejected: '已拒絕',
+  }
+
+  return labels[status]
+}
+
+function articleStatusType(
+  status: TArticleStatus,
+): ArticleTagType {
+  const types: Record<
+    TArticleStatus,
+    ArticleTagType
+  > = {
+    draft: 'info',
+    pending: 'warning',
+    approved: 'success',
+    rejected: 'danger',
+  }
+
+  return types[status]
 }
 </script>
 
