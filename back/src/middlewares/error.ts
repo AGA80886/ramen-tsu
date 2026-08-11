@@ -47,9 +47,25 @@ export default async (
   if (error instanceof MongoServerError && error.code === 11000) {
     const duplicatedField = Object.keys(error.keyPattern ?? {})[0]
 
+    let message = '資料重複'
+
+    switch (duplicatedField) {
+      case 'account':
+        message = '帳號重複'
+        break
+
+      case 'email':
+        message = 'Email 已被使用'
+        break
+
+      case 'slug':
+        message = '文章 Slug 重複'
+        break
+    }
+
     res.status(StatusCodes.CONFLICT).json({
       success: false,
-      message: duplicatedField === 'email' ? 'Email 已被使用' : '帳號重複',
+      message,
     })
     return
   }

@@ -4,15 +4,15 @@ import { StatusCodes } from 'http-status-codes'
 
 import Article from '../models/article'
 import type { TArticleCategory } from '../models/article'
+import cloudinary from '../configs/cloudinary'
 
 interface CreateArticleBody {
   title: string
   slug: string
   summary: string
   content: string
-  coverImage: string
   category: TArticleCategory
-  published?: boolean
+  published?: string
 }
 
 interface UpdateArticleBody {
@@ -20,32 +20,35 @@ interface UpdateArticleBody {
   slug?: string
   summary?: string
   content?: string
-  coverImage?: string
   category?: TArticleCategory
-  published?: boolean
+  published?: string
 }
 
 export const create = async (req: Request, res: Response): Promise<void> => {
-  const id = String(req.params.id ?? '')
+  const body = req.body as CreateArticleBody
 
-  if (!mongoose.isValidObjectId(id)) {
+  if (!req.file?.filename) {
     res.status(StatusCodes.BAD_REQUEST).json({
       success: false,
-      message: '文章 ID 格式錯誤',
+      message: '文章封面圖片必填',
     })
     return
   }
-
-  const body = req.body as CreateArticleBody
 
   const result = await Article.create({
     title: body.title,
     slug: body.slug,
     summary: body.summary,
     content: body.content,
-    coverImage: body.coverImage,
+
+    // Cloudinary public ID
+    coverImage: req.file.filename,
+
     category: body.category,
-    published: body.published ?? false,
+
+    // form-data 傳進來的是字串
+    published: body.published === 'true',
+
     author: req.user!._id,
   })
 
@@ -114,50 +117,59 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     return
   }
 
+  const article = await Article.findById(id)
+
+  if (!article) {
+    throw new Error('ARTICLE NOT FOUND')
+  }
+
   const body = req.body as UpdateArticleBody
-  const updateData: UpdateArticleBody = {}
 
   if (body.title !== undefined) {
-    updateData.title = body.title
+    article.title = body.title
   }
 
   if (body.slug !== undefined) {
-    updateData.slug = body.slug
+    article.slug = body.slug
   }
 
   if (body.summary !== undefined) {
-    updateData.summary = body.summary
+    article.summary = body.summary
   }
 
   if (body.content !== undefined) {
-    updateData.content = body.content
-  }
-
-  if (body.coverImage !== undefined) {
-    updateData.coverImage = body.coverImage
+    article.content = body.content
   }
 
   if (body.category !== undefined) {
-    updateData.category = body.category
+    article.category = body.category
   }
 
   if (body.published !== undefined) {
-    updateData.published = body.published
+    article.published = body.published === 'true'
   }
 
-  const result = await Article.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  })
+  // 先記住舊封面 public ID
+  const oldCoverImage = article.coverImage
 
-  if (!result) {
-    throw new Error('ARTICLE NOT FOUND')
+  // 有上傳新封面才替換
+  if (req.file?.filename) {
+    article.coverImage = req.file.filename
+  }
+
+  await article.save()
+
+  // DB 儲存成功後，再刪除舊封面
+  if (req.file?.filename && oldCoverImage && oldCoverImage !== req.file.filename) {
+    await cloudinary.uploader.destroy(oldCoverImage).catch((cleanupError) => {
+      console.error('刪除舊文章封面失敗', cleanupError)
+    })
   }
 
   res.status(StatusCodes.OK).json({
     success: true,
     message: '文章更新成功',
-    result,
+    result: article,
   })
 }
 
