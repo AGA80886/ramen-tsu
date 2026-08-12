@@ -133,6 +133,80 @@
             </div>
           </AppCard>
 
+          <div class="article-reactions">
+            <div class="article-reactions__group">
+              <AppButton
+                :type="
+                  likeStatus?.liked
+                    ? 'danger'
+                    : 'default'
+                "
+                :plain="!likeStatus?.liked"
+                :loading="
+                  isMutatingLike ||
+                    likeCountLoading
+                "
+                @click="toggleLike"
+              >
+                <span class="reaction-icon">
+                  {{
+                    likeStatus?.liked
+                      ? '♥'
+                      : '♡'
+                  }}
+                </span>
+
+                <span>
+                  {{
+                    likeStatus?.liked
+                      ? '已按讚'
+                      : '按讚'
+                  }}
+                </span>
+
+                <strong>
+                  {{ likeCount?.count ?? 0 }}
+                </strong>
+              </AppButton>
+
+              <AppButton
+                :type="
+                  favoriteStatus?.favorited
+                    ? 'warning'
+                    : 'default'
+                "
+                :plain="
+                  !favoriteStatus?.favorited
+                "
+                :loading="
+                  isMutatingFavorite
+                "
+                @click="toggleFavorite"
+              >
+                <span class="reaction-icon">
+                  {{
+                    favoriteStatus?.favorited
+                      ? '★'
+                      : '☆'
+                  }}
+                </span>
+
+                {{
+                  favoriteStatus?.favorited
+                    ? '已收藏'
+                    : '收藏'
+                }}
+              </AppButton>
+            </div>
+
+            <p
+              v-if="!user.isLoggedIn"
+              class="article-reactions__hint"
+            >
+              登入後即可按讚與收藏文章。
+            </p>
+          </div>
+
           <section class="comments">
             <div class="comments__header">
               <div>
@@ -192,15 +266,7 @@
 
                 <AppButton
                   type="primary"
-                  @click="
-                    router.push({
-                      path: '/login',
-                      query: {
-                        redirect:
-                          route.fullPath,
-                      },
-                    })
-                  "
+                  @click="goToLogin"
                 >
                   前往登入
                 </AppButton>
@@ -347,15 +413,24 @@ import {
   useRouter,
 } from 'vue-router'
 
-import { useMutation, useQuery, } from '@pinia/colada'
+import { useQuery, } from '@pinia/colada'
 
 import {
   articleCommentKeys,
   useCreateArticleCommentMutation,
   useDeleteArticleCommentMutation,
 } from '@/queries/articleComment'
+import {
+  articleReactionKeys,
+  useAddArticleLikeMutation,
+  useRemoveArticleLikeMutation,
+  useAddArticleFavoriteMutation,
+  useRemoveArticleFavoriteMutation,
+} from '@/queries/articleReaction'
 import * as articleService from '@/services/article'
 import * as articleCommentService from '@/services/articleComment'
+import * as articleReactionService
+  from '@/services/articleReaction'
 
 import { useUserStore } from '@/stores/user'
 import { useSnackbarStore } from '@/stores/snackbar'
@@ -369,6 +444,9 @@ const snackbar = useSnackbarStore()
 const commentContent = ref('')
 const deletingCommentId = ref<string | null>(
   null,
+)
+const reactionUserKey = computed(
+  () => user.account || '',
 )
 
 
@@ -421,11 +499,58 @@ const articleId = computed(
   () => article.value?._id ?? '',
 )
 
+const {
+  data: likeCount,
+  isLoading: likeCountLoading,
+} = useQuery({
+  key: () =>
+    articleReactionKeys.likeCount(
+      articleId.value,
+    ),
+
+  query: async () => {
+    const { data } =
+      await articleReactionService
+        .getArticleLikeCount(
+          articleId.value,
+        )
+
+    return data.result
+  },
+
+  enabled: () =>
+    Boolean(articleId.value),
+})
+
 const createCommentMutation =
   useCreateArticleCommentMutation()
 
 const deleteCommentMutation =
   useDeleteArticleCommentMutation()
+
+const addLikeMutation =
+  useAddArticleLikeMutation()
+
+const removeLikeMutation =
+  useRemoveArticleLikeMutation()
+
+const addFavoriteMutation =
+  useAddArticleFavoriteMutation()
+
+const removeFavoriteMutation =
+  useRemoveArticleFavoriteMutation()
+
+const isMutatingLike = computed(
+  () =>
+    addLikeMutation.isLoading.value ||
+    removeLikeMutation.isLoading.value,
+)
+
+const isMutatingFavorite = computed(
+  () =>
+    addFavoriteMutation.isLoading.value ||
+    removeFavoriteMutation.isLoading.value,
+)
 
 const isCreatingComment = computed(() => {
   return createCommentMutation
@@ -455,6 +580,57 @@ const {
 
   enabled: () =>
     Boolean(articleId.value),
+})
+
+const {
+  data: likeStatus,
+} = useQuery({
+  key: () =>
+    articleReactionKeys.likeStatus(
+      articleId.value,
+      reactionUserKey.value,
+    ),
+
+  query: async () => {
+    const { data } =
+      await articleReactionService
+        .getMyArticleLikeStatus(
+          articleId.value,
+        )
+
+    return data.result
+  },
+
+  enabled: () =>
+    Boolean(articleId.value) &&
+    Boolean(reactionUserKey.value) &&
+    user.isLoggedIn,
+})
+
+const {
+  data: favoriteStatus,
+} = useQuery({
+  key: () =>
+    articleReactionKeys
+      .favoriteStatus(
+        articleId.value,
+        reactionUserKey.value,
+      ),
+
+  query: async () => {
+    const { data } =
+      await articleReactionService
+        .getMyArticleFavoriteStatus(
+          articleId.value,
+        )
+
+    return data.result
+  },
+
+  enabled: () =>
+    Boolean(articleId.value) &&
+    Boolean(reactionUserKey.value) &&
+    user.isLoggedIn,
 })
 
 function canDeleteComment(
@@ -586,6 +762,109 @@ Promise<void> {
     await refetch()
   } finally {
     isReloading.value = false
+  }
+}
+
+async function goToLogin():
+Promise<void> {
+  await router.push({
+    path: '/login',
+    query: {
+      redirect: route.fullPath,
+    },
+  })
+}
+
+async function toggleLike():
+Promise<void> {
+  if (!user.isLoggedIn) {
+    await goToLogin()
+    return
+  }
+
+  if (
+    !articleId.value ||
+    isMutatingLike.value
+  ) {
+    return
+  }
+
+  try {
+    if (likeStatus.value?.liked) {
+      await removeLikeMutation
+        .mutateAsync({
+          articleId: articleId.value,
+          userKey: reactionUserKey.value
+        })
+
+      snackbar.add({
+        text: '已取消按讚',
+        color: 'success',
+      })
+
+      return
+    }
+
+    await addLikeMutation
+      .mutateAsync({
+        articleId: articleId.value,
+        userKey: reactionUserKey.value
+      })
+
+    snackbar.add({
+      text: '按讚成功',
+      color: 'success',
+    })
+  } catch (error) {
+    snackbar.addError(error)
+  }
+}
+
+async function toggleFavorite():
+Promise<void> {
+  if (!user.isLoggedIn) {
+    await goToLogin()
+    return
+  }
+
+  if (
+    !articleId.value ||
+    isMutatingFavorite.value
+  ) {
+    return
+  }
+
+  try {
+    if (
+      favoriteStatus.value
+        ?.favorited
+    ) {
+      await removeFavoriteMutation
+        .mutateAsync({
+          articleId: articleId.value,
+          userKey: reactionUserKey.value
+        })
+
+      snackbar.add({
+        text: '已取消收藏',
+        color: 'success',
+      })
+
+      return
+    }
+
+    await addFavoriteMutation
+      .mutateAsync({
+        articleId: articleId.value,
+        userKey: reactionUserKey.value
+      })
+
+    snackbar.add({
+      text: '收藏成功',
+      color: 'success',
+    })
+  } catch (error) {
+    snackbar.addError(error)
   }
 }
 </script>
@@ -803,6 +1082,42 @@ meta:
   }
 }
 
+.article-reactions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid
+    var(--color-border);
+  border-radius: var(--radius-md);
+  background:
+    var(--color-surface);
+
+  &__group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    :deep(.el-button) {
+      margin-left: 0;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    color:
+      var(--color-text-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+.reaction-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
 @media (max-width: 640px) {
   .article-detail-page {
     padding: 28px 0 48px;
@@ -870,6 +1185,25 @@ meta:
   .comment {
     &__header {
       gap: 12px;
+    }
+  }
+
+  .article-reactions {
+    align-items: stretch;
+    flex-direction: column;
+
+    &__group {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      :deep(.el-button) {
+        width: 100%;
+      }
+    }
+
+    &__hint {
+      text-align: center;
     }
   }
 

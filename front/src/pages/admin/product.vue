@@ -172,10 +172,10 @@
             v-model:raw-model-value="rawFileRecords"
             accept="image/png,image/jpeg"
             deletable
-            :error-text="{ type: '檔案類型無效', size: '文件大小不應超過 1MB' }"
+            :error-text="{ type: '檔案類型無效', size: '文件大小不應超過 2MB' }"
             help-text="選擇檔案或將檔案拖曳到此處"
-            :max-files="1"
-            max-size="1MB"
+            :max-files="2"
+            max-size="2MB"
           />
         </el-form-item>
       </el-form>

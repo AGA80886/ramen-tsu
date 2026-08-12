@@ -9,6 +9,7 @@ import type {
 import {
   defineMutation,
   useMutation,
+  useQueryCache,
 } from '@pinia/colada'
 
 import * as auth from '@/services/auth'
@@ -36,12 +37,32 @@ export const useLoginMutation = defineMutation(() => {
 
 export const useLogoutMutation = defineMutation(() => {
   const user = useUserStore()
+  const queryCache = useQueryCache()
 
   return useMutation({
-    mutation: () =>
-      auth.logout(),
+    mutation: () => auth.logout(),
 
     onSettled: () => {
+      const privateQueryPrefixes = [
+        ['article-reactions'],
+        ['article', 'mine'],
+        ['profile', 'me'],
+        ['order', 'mine'],
+        ['cart'],
+      ]
+
+      for (const key of privateQueryPrefixes) {
+        const entries =
+          queryCache.getEntries({
+            key,
+          })
+
+        for (const entry of entries) {
+          queryCache.cancel(entry)
+          queryCache.remove(entry)
+        }
+      }
+
       user.logout()
     },
   })

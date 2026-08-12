@@ -25,11 +25,14 @@ export const useUserStore = defineStore('user', () => {
   })
 
   function login(data: LoginResponse): void {
-    accessToken.value = data.accessToken
-    account.value = data.account
-    role.value = data.role
-    cart.value = data.cart
-  }
+  email.value = ''
+  nickname.value = ''
+  avatar.value = ''
+  accessToken.value = data.accessToken
+  account.value = data.account
+  role.value = data.role
+  cart.value = data.cart
+}
 
   function updateProfile(profile: UserProfile): void {
     account.value = profile.account
