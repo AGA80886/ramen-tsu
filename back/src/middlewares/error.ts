@@ -248,6 +248,20 @@ export default async (
         })
         return
 
+      case 'ARTICLE COMMENT NOT FOUND':
+        res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: '找不到此留言',
+        })
+        return
+
+      case 'ARTICLE COMMENT FORBIDDEN':
+        res.status(StatusCodes.FORBIDDEN).json({
+          success: false,
+          message: '無權刪除此留言',
+        })
+        return
+
       default:
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,
