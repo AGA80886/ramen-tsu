@@ -7,6 +7,7 @@ import {
 } from '@pinia/colada'
 
 import * as articleService from '@/services/article'
+import { useUserStore } from '@/stores/user'
 import type {
   ICreateArticle,
   IUpdateArticle,
@@ -15,10 +16,33 @@ import type {
 
 const STALE_TIME = 1000 * 60 * 5
 
+export const articleKeys = {
+  all: ['article'] as const,
+
+  public: () =>
+    [
+      ...articleKeys.all,
+      'public',
+    ] as const,
+
+  admin: () =>
+    [
+      ...articleKeys.all,
+      'admin',
+    ] as const,
+
+  mine: (userKey: string) =>
+    [
+      ...articleKeys.all,
+      'mine',
+      userKey,
+    ] as const,
+}
+
 // 公開文章列表
 export const useArticlesQuery = defineQuery(() => {
   return useQuery({
-    key: ['article', 'public'],
+    key: articleKeys.public(),
 
     query: async () => {
       const { data } =
@@ -34,7 +58,7 @@ export const useArticlesQuery = defineQuery(() => {
 // Admin：全部文章
 export const useAdminArticlesQuery = defineQuery(() => {
   return useQuery({
-    key: ['article', 'admin'],
+    key: articleKeys.admin(),
 
     query: async () => {
       const { data } =
@@ -123,7 +147,7 @@ export const useDeleteArticleMutation =
     })
   })
 
-  export const useUpdateArticleStatusMutation =
+export const useUpdateArticleStatusMutation =
   defineMutation(() => {
     const queryCache = useQueryCache()
 
@@ -155,10 +179,15 @@ export const useDeleteArticleMutation =
     })
   })
 
-  export const useMyArticlesQuery =
+export const useMyArticlesQuery =
   defineQuery(() => {
+    const user = useUserStore()
+
     return useQuery({
-      key: ['article', 'mine'],
+      key: () =>
+        articleKeys.mine(
+          user.account,
+        ),
 
       query: async () => {
         const { data } =
@@ -167,6 +196,10 @@ export const useDeleteArticleMutation =
 
         return data.result
       },
+
+      enabled: () =>
+        user.isLoggedIn &&
+        Boolean(user.account),
 
       staleTime: STALE_TIME,
     })

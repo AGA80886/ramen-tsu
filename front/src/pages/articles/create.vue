@@ -100,11 +100,11 @@
               deletable
               :error-text="{
                 type: '檔案類型無效',
-                size: '圖片大小不可超過 1MB',
+                size: '圖片大小不可超過 2MB',
               }"
               help-text="選擇圖片或將圖片拖曳到此處"
-              :max-files="1"
-              max-size="1MB"
+              :max-files="2"
+              max-size="2MB"
             />
           </el-form-item>
 

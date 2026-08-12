@@ -178,6 +178,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/user/favorites/': RouteRecordInfo<
+      '/user/favorites/',
+      '/user/favorites',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/user/orders/': RouteRecordInfo<
       '/user/orders/',
       '/user/orders',
@@ -375,6 +382,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/user/cart.vue': {
       routes:
         | '/user/cart'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/favorites/index.vue': {
+      routes:
+        | '/user/favorites/'
       views:
         | never
       pathParamNames:

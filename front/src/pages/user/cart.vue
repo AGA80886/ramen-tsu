@@ -369,7 +369,7 @@ async function removeItem(
 }
 
 async function goShopping(): Promise<void> {
-  await router.push('/')
+  await router.push('/shop')
 }
 
 async function goToCheckout(): Promise<void> {

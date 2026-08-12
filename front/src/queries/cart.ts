@@ -13,34 +13,71 @@ import { useUserStore } from '@/stores/user'
 
 const STALE_TIME = 1000 * 60 * 5
 
-export const useAddCartItemMutation = defineMutation(() => {
-  const user = useUserStore()
-  const queryCache = useQueryCache()
+export const cartKeys = {
+  all: ['cart'] as const,
 
-  return useMutation({
-    mutation: (data: CartForm) =>
-      cartService.addCartItem(data),
+  mine: (
+    userKey: string,
+  ) =>
+    [
+      ...cartKeys.all,
+      'mine',
+      userKey,
+    ] as const,
+}
 
-    onSuccess: response => {
-      user.cart = response.data.result
+export const useAddCartItemMutation =
+  defineMutation(() => {
+    const user = useUserStore()
+    const queryCache =
+      useQueryCache()
 
-      queryCache.invalidateQueries({
-        key: ['cart'],
-      })
-    },
+    return useMutation({
+      mutation: (
+        data: CartForm,
+      ) =>
+        cartService
+          .addCartItem(data),
+
+      onSuccess: async response => {
+        // Header 購物車數量同步
+        user.cart =
+          response.data.result
+
+        // 只更新目前會員自己的購物車
+        await queryCache
+          .invalidateQueries({
+            key:
+              cartKeys.mine(
+                user.account,
+              ),
+          })
+      },
+    })
   })
-})
 
-export const useCartItemsQuery = defineQuery(() => {
-  return useQuery({
-    key: ['cart'],
+export const useCartItemsQuery =
+  defineQuery(() => {
+    const user = useUserStore()
 
-    query: async () => {
-      const { data } = await cartService.getCartItems()
+    return useQuery({
+      key: () =>
+        cartKeys.mine(
+          user.account,
+        ),
 
-      return data.result
-    },
+      query: async () => {
+        const { data } =
+          await cartService
+            .getCartItems()
 
-    staleTime: STALE_TIME,
+        return data.result
+      },
+
+      enabled: () =>
+        user.isLoggedIn &&
+        Boolean(user.account),
+
+      staleTime: STALE_TIME,
+    })
   })
-})

@@ -19,6 +19,14 @@
       </AppButton>
 
       <AppButton
+        type="warning"
+        plain
+        @click="goToMyFavorites"
+      >
+        我的收藏
+      </AppButton>
+
+      <AppButton
         type="primary"
         @click="goToCreateArticle"
       >
@@ -353,6 +361,10 @@ const snackbar = useSnackbarStore()
 const router = useRouter()
 function goToMyArticles(): void {
   router.push('/user/articles')
+}
+
+function goToMyFavorites(): void {
+  router.push('/user/favorites')
 }
 
 function goToCreateArticle(): void {
@@ -901,9 +913,11 @@ function resetPasswordFields(): void {
 
   .profile-actions {
     flex-direction: column-reverse;
+    gap: 12px;
 
     :deep(.el-button) {
       width: 100%;
+      margin-left: 0;
     }
   }
 
