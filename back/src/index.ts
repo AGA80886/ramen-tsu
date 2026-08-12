@@ -9,6 +9,8 @@ import routeUser from './routes/user'
 import routeOrder from './routes/order'
 import routerArticle from './routes/article'
 import routerArticleComment from './routes/articleComment'
+import routerArticleLike from './routes/articleLike'
+import routerArticleFavorite from './routes/articleFavorite'
 import middlewareError from './middlewares/error'
 import './configs/passport'
 
@@ -52,6 +54,8 @@ app.use('/user', routeUser)
 app.use('/order', routeOrder)
 app.use('/article', routerArticle)
 app.use('/article', routerArticleComment)
+app.use('/article', routerArticleLike)
+app.use('/article', routerArticleFavorite)
 app.use(middlewareError)
 
 async function startServer(): Promise<void> {
