@@ -133,6 +133,194 @@
             </div>
           </AppCard>
 
+          <section class="comments">
+            <div class="comments__header">
+              <div>
+                <h2>留言區</h2>
+
+                <p>
+                  與其他拉麵愛好者一起交流。
+                </p>
+              </div>
+
+              <span class="comments__count">
+                {{ comments?.length ?? 0 }} 則留言
+              </span>
+            </div>
+
+            <!-- 留言輸入 -->
+            <AppCard class="comments__form">
+              <template v-if="user.isLoggedIn">
+                <el-input
+                  v-model="commentContent"
+                  type="textarea"
+                  :rows="4"
+                  maxlength="1000"
+                  show-word-limit
+                  resize="vertical"
+                  placeholder="分享你對這篇文章的想法..."
+                  @keydown.ctrl.enter="
+                    submitComment
+                  "
+                />
+
+                <div class="comments__form-actions">
+                  <span>
+                    Ctrl + Enter 快速送出
+                  </span>
+
+                  <AppButton
+                    type="primary"
+                    :loading="isCreatingComment"
+                    :disabled="
+                      !commentContent.trim()
+                    "
+                    @click="submitComment"
+                  >
+                    送出留言
+                  </AppButton>
+                </div>
+              </template>
+
+              <div
+                v-else
+                class="comments__login"
+              >
+                <p>
+                  登入後即可參與留言。
+                </p>
+
+                <AppButton
+                  type="primary"
+                  @click="
+                    router.push({
+                      path: '/login',
+                      query: {
+                        redirect:
+                          route.fullPath,
+                      },
+                    })
+                  "
+                >
+                  前往登入
+                </AppButton>
+              </div>
+            </AppCard>
+
+            <!-- Comments Loading -->
+            <AppLoading
+              :loading="commentsLoading"
+              text="正在載入留言..."
+              min-height="180px"
+            >
+              <!-- Error -->
+              <AppCard
+                v-if="commentsError"
+                class="comments__state"
+              >
+                <AppEmpty
+                  description="目前無法取得留言"
+                >
+                  <AppButton
+                    @click="refetchComments"
+                  >
+                    重新載入
+                  </AppButton>
+                </AppEmpty>
+              </AppCard>
+
+              <!-- Empty -->
+              <AppCard
+                v-else-if="
+                  !comments?.length
+                "
+                class="comments__state"
+              >
+                <AppEmpty
+                  description="目前還沒有留言，成為第一個留言的人吧！"
+                />
+              </AppCard>
+
+              <!-- List -->
+              <div
+                v-else
+                class="comments__list"
+              >
+                <AppCard
+                  v-for="comment in comments"
+                  :key="comment._id"
+                  class="comment"
+                >
+                  <div class="comment__header">
+                    <div class="comment__author">
+                      <el-avatar
+                        :size="42"
+                        :src="
+                          comment.author.avatar
+                        "
+                      >
+                        {{
+                          (
+                            comment.author
+                              .nickname ||
+                            comment.author
+                              .account
+                          )
+                            .charAt(0)
+                            .toUpperCase()
+                        }}
+                      </el-avatar>
+
+                      <div>
+                        <strong>
+                          {{
+                            comment.author
+                              .nickname ||
+                              comment.author
+                                .account
+                          }}
+                        </strong>
+
+                        <div class="comment__time">
+                          {{
+                            formatDateTime(
+                              comment.createdAt,
+                            )
+                          }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <AppButton
+                      v-if="
+                        canDeleteComment(
+                          comment.author.account,
+                        )
+                      "
+                      type="danger"
+                      plain
+                      :loading="
+                        deletingCommentId ===
+                          comment._id
+                      "
+                      @click="
+                        handleDeleteComment(
+                          comment._id,
+                        )
+                      "
+                    >
+                      刪除
+                    </AppButton>
+                  </div>
+
+                  <p class="comment__content">
+                    {{ comment.content }}
+                  </p>
+                </AppCard>
+              </div>
+            </AppLoading>
+          </section>
+
           <!-- Footer -->
           <footer class="article__footer">
             <AppButton
@@ -159,11 +347,30 @@ import {
   useRouter,
 } from 'vue-router'
 
-import { useQuery, } from '@pinia/colada'
+import { useMutation, useQuery, } from '@pinia/colada'
+
+import {
+  articleCommentKeys,
+  useCreateArticleCommentMutation,
+  useDeleteArticleCommentMutation,
+} from '@/queries/articleComment'
 import * as articleService from '@/services/article'
+import * as articleCommentService from '@/services/articleComment'
+
+import { useUserStore } from '@/stores/user'
+import { useSnackbarStore } from '@/stores/snackbar'
 
 const route = useRoute()
 const router = useRouter()
+
+const user = useUserStore()
+const snackbar = useSnackbarStore()
+
+const commentContent = ref('')
+const deletingCommentId = ref<string | null>(
+  null,
+)
+
 
 const slug = computed(() => {
   const params =
@@ -209,6 +416,147 @@ const {
 })
 
 const isReloading = ref(false)
+
+const articleId = computed(
+  () => article.value?._id ?? '',
+)
+
+const createCommentMutation =
+  useCreateArticleCommentMutation()
+
+const deleteCommentMutation =
+  useDeleteArticleCommentMutation()
+
+const isCreatingComment = computed(() => {
+  return createCommentMutation
+    .isLoading.value
+})
+
+const {
+  data: comments,
+  error: commentsError,
+  isLoading: commentsLoading,
+  refetch: refetchComments,
+} = useQuery({
+  key: () =>
+    articleCommentKeys.list(
+      articleId.value,
+    ),
+
+  query: async () => {
+    const { data } =
+      await articleCommentService
+        .getArticleComments(
+          articleId.value,
+        )
+
+    return data.result
+  },
+
+  enabled: () =>
+    Boolean(articleId.value),
+})
+
+function canDeleteComment(
+  authorAccount: string,
+): boolean {
+  if (!user.isLoggedIn) {
+    return false
+  }
+
+  return (
+    user.account === authorAccount ||
+    user.role === 'admin'
+  )
+}
+
+async function submitComment():
+Promise<void> {
+  if (!user.isLoggedIn) {
+    await router.push({
+      path: '/login',
+      query: {
+        redirect: route.fullPath,
+      },
+    })
+
+    return
+  }
+
+  const content =
+    commentContent.value.trim()
+
+  if (!content) {
+    snackbar.add({
+      text: '請輸入留言內容',
+      color: 'warning',
+    })
+    return
+  }
+
+  if (content.length > 1000) {
+    snackbar.add({
+      text: '留言內容最多 1000 個字',
+      color: 'warning',
+    })
+    return
+  }
+
+  if (!articleId.value) {
+    return
+  }
+
+  try {
+    await createCommentMutation
+      .mutateAsync({
+        articleId: articleId.value,
+        data: {
+          content,
+        },
+      })
+
+    commentContent.value = ''
+
+    snackbar.add({
+      text: '留言成功',
+      color: 'success',
+    })
+  } catch (error) {
+    snackbar.addError(error)
+  }
+}
+
+async function handleDeleteComment(
+  commentId: string,
+): Promise<void> {
+  if (
+    !articleId.value ||
+    deletingCommentId.value
+  ) {
+    return
+  }
+
+  deletingCommentId.value =
+    commentId
+
+  try {
+    await deleteCommentMutation
+      .mutateAsync({
+        articleId: articleId.value,
+        commentId,
+      })
+
+    snackbar.add({
+      text: '留言已刪除',
+      color: 'success',
+    })
+  } catch (error) {
+    snackbar.addError(error)
+  } finally {
+    deletingCommentId.value =
+      null
+  }
+}
 
 function formatDateTime(
   value: string,
@@ -351,6 +699,110 @@ meta:
   }
 }
 
+.comments {
+  margin-top: 48px;
+
+  &__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+
+    h2 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    p {
+      margin: 6px 0 0;
+      color:
+        var(--color-text-secondary);
+    }
+  }
+
+  &__count {
+    flex-shrink: 0;
+    color:
+      var(--color-text-secondary);
+    font-size: 0.9rem;
+  }
+
+  &__form {
+    margin-bottom: 24px;
+  }
+
+  &__form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 14px;
+
+    span {
+      color:
+        var(--color-text-secondary);
+      font-size: 0.85rem;
+    }
+  }
+
+  &__login {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    p {
+      margin: 0;
+      color:
+        var(--color-text-secondary);
+    }
+  }
+
+  &__list {
+    display: grid;
+    gap: 16px;
+  }
+
+  &__state {
+    margin-top: 16px;
+  }
+}
+
+.comment {
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    strong {
+      display: block;
+    }
+  }
+
+  &__time {
+    margin-top: 3px;
+    color:
+      var(--color-text-secondary);
+    font-size: 0.8rem;
+  }
+
+  &__content {
+    margin:
+      18px 0 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.8;
+  }
+}
+
 @media (max-width: 640px) {
   .article-detail-page {
     padding: 28px 0 48px;
@@ -384,4 +836,41 @@ meta:
     }
   }
 }
+
+.comments {
+    margin-top: 36px;
+
+    &__header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__form-actions {
+      align-items: stretch;
+      flex-direction: column;
+
+      :deep(.el-button) {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+
+    &__login {
+      align-items: stretch;
+      flex-direction: column;
+
+      :deep(.el-button) {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+  }
+
+  .comment {
+    &__header {
+      gap: 12px;
+    }
+  }
+
 </style>
