@@ -40,7 +40,7 @@
               <span>拉麵論壇</span>
             </el-menu-item>
 
-            <el-menu-item index="/ramen-map">
+            <el-menu-item index="/map">
               <span>拉麵地圖</span>
             </el-menu-item>
 
@@ -179,7 +179,7 @@
                   拉麵論壇
                 </el-dropdown-item>
 
-                <el-dropdown-item command="/ramen-map">
+                <el-dropdown-item command="/map">
                   拉麵地圖
                 </el-dropdown-item>
 
