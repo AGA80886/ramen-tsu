@@ -66,6 +66,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/admin/shops/': RouteRecordInfo<
+      '/admin/shops/',
+      '/admin/shops',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/articles/': RouteRecordInfo<
       '/articles/',
       '/articles',
@@ -129,6 +136,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/online-store': RouteRecordInfo<
+      '/online-store',
+      '/online-store',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/product/[id]': RouteRecordInfo<
       '/product/[id]',
       '/product/:id',
@@ -157,9 +171,23 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/shop': RouteRecordInfo<
-      '/shop',
-      '/shop',
+    '/shops/': RouteRecordInfo<
+      '/shops/',
+      '/shops',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/shops/[slug]': RouteRecordInfo<
+      '/shops/[slug]',
+      '/shops/:slug',
+      { slug: ParamValue<true> },
+      { slug: ParamValue<false> },
+      | never
+    >,
+    '/shops/create': RouteRecordInfo<
+      '/shops/create',
+      '/shops/create',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -185,9 +213,16 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/user/favorites/': RouteRecordInfo<
-      '/user/favorites/',
-      '/user/favorites',
+    '/user/favorite-articles/': RouteRecordInfo<
+      '/user/favorite-articles/',
+      '/user/favorite-articles',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/favorite-shops/': RouteRecordInfo<
+      '/user/favorite-shops/',
+      '/user/favorite-shops',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -202,6 +237,20 @@ declare module 'vue-router/auto-routes' {
     '/user/orders/[id]': RouteRecordInfo<
       '/user/orders/[id]',
       '/user/orders/:id',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/user/shops/': RouteRecordInfo<
+      '/user/shops/',
+      '/user/shops',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/shops/[id]/edit': RouteRecordInfo<
+      '/user/shops/[id]/edit',
+      '/user/shops/:id/edit',
       { id: ParamValue<true> },
       { id: ParamValue<false> },
       | never
@@ -261,6 +310,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/admin/product.vue': {
       routes:
         | '/admin/product'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/shops/index.vue': {
+      routes:
+        | '/admin/shops/'
       views:
         | never
       pathParamNames:
@@ -338,6 +395,14 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
+    'src/pages/online-store.vue': {
+      routes:
+        | '/online-store'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
     'src/pages/product/[id].vue': {
       routes:
         | '/product/[id]'
@@ -370,9 +435,25 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/shop.vue': {
+    'src/pages/shops/index.vue': {
       routes:
-        | '/shop'
+        | '/shops/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/shops/[slug].vue': {
+      routes:
+        | '/shops/[slug]'
+      views:
+        | never
+      pathParamNames:
+        | 'slug'
+    }
+    'src/pages/shops/create.vue': {
+      routes:
+        | '/shops/create'
       views:
         | never
       pathParamNames:
@@ -402,9 +483,17 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/user/favorites/index.vue': {
+    'src/pages/user/favorite-articles/index.vue': {
       routes:
-        | '/user/favorites/'
+        | '/user/favorite-articles/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/favorite-shops/index.vue': {
+      routes:
+        | '/user/favorite-shops/'
       views:
         | never
       pathParamNames:
@@ -425,6 +514,22 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | 'id'
+    }
+    'src/pages/user/shops/index.vue': {
+      routes:
+        | '/user/shops/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/shops/[id]/edit.vue': {
+      routes:
+        | '/user/shops/[id]/edit'
+      views:
+        | never
+      pathParamNames:
+        | never
     }
     'src/pages/verify-email.vue': {
       routes:

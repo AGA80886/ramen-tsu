@@ -133,6 +133,6 @@ watch(search, () => { page.value = 1 }, { deep: true })
 
 <route lang="yaml">
 meta:
-  title: 線上商城
+  title: 拉麵商城
 </route>
 

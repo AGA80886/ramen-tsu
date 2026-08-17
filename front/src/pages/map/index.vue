@@ -155,3 +155,8 @@
   }
 }
 </style>
+
+<route lang="yaml">
+meta:
+  title: 拉麵地圖
+</route>

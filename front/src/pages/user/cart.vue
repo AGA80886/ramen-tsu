@@ -1,207 +1,218 @@
 <template>
-  <section class="cart-page">
-    <header class="cart-page__header">
-      <h1>購物車</h1>
-      <p>確認商品數量與金額，再進入結帳流程。</p>
-    </header>
+  <main class="cart-page">
+    <section class="cart-hero">
+      <div class="page-container cart-hero__inner">
+        <div>
+          <p class="eyebrow">
+            RAMEN STORE
+          </p>
+          <h1>購物車</h1>
+          <p class="cart-hero__description">
+            確認商品數量與金額，再進入結帳流程。
+          </p>
+        </div>
+      </div>
+    </section>
 
-    <AppLoading
-      :loading="isLoading"
-      text="正在載入購物車..."
-      min-height="360px"
-    >
-      <AppCard
-        v-if="error"
-        class="cart-state"
+    <section class="page-container cart-content">
+      <AppLoading
+        :loading="isLoading"
+        text="正在載入購物車..."
+        min-height="360px"
       >
-        <AppEmpty description="無法取得購物車資料">
-          <AppButton
-            :loading="isReloading"
-            @click="reloadCart"
-          >
-            重新載入
-          </AppButton>
-        </AppEmpty>
-      </AppCard>
-
-      <AppCard
-        v-else-if="validCartItems.length === 0"
-        class="cart-state"
-      >
-        <el-alert
-          v-if="invalidItemCount > 0"
-          class="invalid-cart-alert"
-          type="warning"
-          :closable="false"
-          show-icon
-          title="購物車內有已不存在的商品"
-          description="失效商品不會列入金額計算，請重新整理或聯絡管理員協助處理。"
-        />
-
-        <AppEmpty description="購物車目前沒有可購買的商品">
-          <AppButton @click="goShopping">
-            繼續購物
-          </AppButton>
-        </AppEmpty>
-      </AppCard>
-
-      <template v-else>
-        <el-alert
-          v-if="invalidItemCount > 0"
-          class="invalid-cart-alert"
-          type="warning"
-          :closable="false"
-          show-icon
-          :title="`購物車內有 ${invalidItemCount} 項商品已不存在`"
-          description="失效商品不會列入金額計算，也不能進入結帳流程。"
-        />
-
-        <div class="cart-layout">
-          <AppCard
-            class="cart-items-card"
-            title="商品清單"
-          >
-            <div
-              v-for="item in validCartItems"
-              :key="item._id"
-              class="cart-item"
+        <AppCard
+          v-if="error"
+          class="cart-state"
+        >
+          <AppEmpty description="無法取得購物車資料">
+            <AppButton
+              :loading="isReloading"
+              @click="reloadCart"
             >
-              <RouterLink
-                class="cart-item__image-link"
-                :to="`/product/${item.product._id}`"
-              >
-                <el-image
-                  class="cart-item__image"
-                  fit="cover"
-                  :src="item.product.imageUrl || item.product.image"
-                >
-                  <template #error>
-                    <div class="cart-item__image-error">
-                      圖片載入失敗
-                    </div>
-                  </template>
-                </el-image>
-              </RouterLink>
+              重新載入
+            </AppButton>
+          </AppEmpty>
+        </AppCard>
 
-              <div class="cart-item__content">
+        <AppCard
+          v-else-if="validCartItems.length === 0"
+          class="cart-state"
+        >
+          <el-alert
+            v-if="invalidItemCount > 0"
+            class="invalid-cart-alert"
+            type="warning"
+            :closable="false"
+            show-icon
+            title="購物車內有已不存在的商品"
+            description="失效商品不會列入金額計算，請重新整理或聯絡管理員協助處理。"
+          />
+
+          <AppEmpty description="購物車目前沒有可購買的商品">
+            <AppButton @click="goOnlineStore">
+              繼續購物
+            </AppButton>
+          </AppEmpty>
+        </AppCard>
+
+        <template v-else>
+          <el-alert
+            v-if="invalidItemCount > 0"
+            class="invalid-cart-alert"
+            type="warning"
+            :closable="false"
+            show-icon
+            :title="`購物車內有 ${invalidItemCount} 項商品已不存在`"
+            description="失效商品不會列入金額計算，也不能進入結帳流程。"
+          />
+
+          <div class="cart-layout">
+            <AppCard
+              class="cart-items-card"
+              title="商品清單"
+            >
+              <div
+                v-for="item in validCartItems"
+                :key="item._id"
+                class="cart-item"
+              >
                 <RouterLink
-                  class="cart-item__name"
+                  class="cart-item__image-link"
                   :to="`/product/${item.product._id}`"
                 >
-                  {{ item.product.name }}
+                  <el-image
+                    class="cart-item__image"
+                    fit="cover"
+                    :src="item.product.imageUrl || item.product.image"
+                  >
+                    <template #error>
+                      <div class="cart-item__image-error">
+                        圖片載入失敗
+                      </div>
+                    </template>
+                  </el-image>
                 </RouterLink>
 
-                <p class="cart-item__category">
-                  {{ item.product.category }}
-                </p>
+                <div class="cart-item__content">
+                  <RouterLink
+                    class="cart-item__name"
+                    :to="`/product/${item.product._id}`"
+                  >
+                    {{ item.product.name }}
+                  </RouterLink>
 
-                <p class="cart-item__price">
-                  單價：{{ formatCurrency(item.product.price) }}
-                </p>
-              </div>
+                  <p class="cart-item__category">
+                    {{ item.product.category }}
+                  </p>
 
-              <div class="cart-item__quantity">
-                <span class="cart-item__label">數量</span>
+                  <p class="cart-item__price">
+                    單價：{{ formatCurrency(item.product.price) }}
+                  </p>
+                </div>
 
-                <el-input-number
-                  :model-value="item.quantity"
-                  :min="1"
-                  :max="99"
+                <div class="cart-item__quantity">
+                  <span class="cart-item__label">數量</span>
+
+                  <el-input-number
+                    :model-value="item.quantity"
+                    :min="1"
+                    :max="99"
+                    :disabled="isMutatingCart"
+                    @change="
+                      updateQuantity(
+                        item.product._id,
+                        $event,
+                        item.quantity,
+                      )
+                    "
+                  />
+                </div>
+
+                <div class="cart-item__subtotal">
+                  <span class="cart-item__label">小計</span>
+                  <strong>
+                    {{
+                      formatCurrency(
+                        item.product.price * item.quantity,
+                      )
+                    }}
+                  </strong>
+                </div>
+
+                <el-button
+                  class="cart-item__remove"
+                  type="danger"
+                  plain
+                  :loading="
+                    pendingProductId === item.product._id &&
+                      isMutatingCart
+                  "
                   :disabled="isMutatingCart"
-                  @change="
-                    updateQuantity(
-                      item.product._id,
-                      $event,
-                      item.quantity,
-                    )
-                  "
-                />
-              </div>
-
-              <div class="cart-item__subtotal">
-                <span class="cart-item__label">小計</span>
-                <strong>
-                  {{
-                    formatCurrency(
-                      item.product.price * item.quantity,
-                    )
-                  }}
-                </strong>
-              </div>
-
-              <el-button
-                class="cart-item__remove"
-                type="danger"
-                plain
-                :loading="
-                  pendingProductId === item.product._id &&
-                    isMutatingCart
-                "
-                :disabled="isMutatingCart"
-                @click="removeItem(
-                  item.product._id,
-                  item.product.name,
-                )"
-              >
-                移除
-              </el-button>
-            </div>
-          </AppCard>
-
-          <aside class="cart-summary">
-            <AppCard title="訂單摘要">
-              <dl class="summary-list">
-                <div>
-                  <dt>商品種類</dt>
-                  <dd>{{ validCartItems.length }}</dd>
-                </div>
-
-                <div>
-                  <dt>商品總數</dt>
-                  <dd>{{ totalQuantity }}</dd>
-                </div>
-
-                <div class="summary-list__total">
-                  <dt>總金額</dt>
-                  <dd>{{ formatCurrency(totalPrice) }}</dd>
-                </div>
-              </dl>
-
-              <div class="summary-actions">
-                <AppButton
-                  class="summary-button"
-                  type="default"
-                  @click="goShopping"
+                  @click="removeItem(
+                    item.product._id,
+                    item.product.name,
+                  )"
                 >
-                  繼續購物
-                </AppButton>
-
-                <AppButton
-                  class="summary-button"
-                  type="primary"
-                  :disabled="
-                    isMutatingCart ||
-                      invalidItemCount > 0 ||
-                      validCartItems.length === 0
-                  "
-                  @click="goToCheckout"
-                >
-                  前往結帳
-                </AppButton>
+                  移除
+                </el-button>
               </div>
-
-              <p
-                v-if="invalidItemCount > 0"
-                class="summary-hint"
-              >
-                請先處理失效商品，才能進入結帳流程。
-              </p>
             </AppCard>
-          </aside>
-        </div>
-      </template>
-    </AppLoading>
-  </section>
+
+            <aside class="cart-summary">
+              <AppCard title="訂單摘要">
+                <dl class="summary-list">
+                  <div>
+                    <dt>商品種類</dt>
+                    <dd>{{ validCartItems.length }}</dd>
+                  </div>
+
+                  <div>
+                    <dt>商品總數</dt>
+                    <dd>{{ totalQuantity }}</dd>
+                  </div>
+
+                  <div class="summary-list__total">
+                    <dt>總金額</dt>
+                    <dd>{{ formatCurrency(totalPrice) }}</dd>
+                  </div>
+                </dl>
+
+                <div class="summary-actions">
+                  <AppButton
+                    class="summary-button"
+                    type="default"
+                    @click="goOnlineStore"
+                  >
+                    繼續購物
+                  </AppButton>
+
+                  <AppButton
+                    class="summary-button"
+                    type="primary"
+                    :disabled="
+                      isMutatingCart ||
+                        invalidItemCount > 0 ||
+                        validCartItems.length === 0
+                    "
+                    @click="goToCheckout"
+                  >
+                    前往結帳
+                  </AppButton>
+                </div>
+
+                <p
+                  v-if="invalidItemCount > 0"
+                  class="summary-hint"
+                >
+                  請先處理失效商品，才能進入結帳流程。
+                </p>
+              </AppCard>
+            </aside>
+          </div>
+        </template>
+      </AppLoading>
+    </section>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -368,8 +379,8 @@ async function removeItem(
   }
 }
 
-async function goShopping(): Promise<void> {
-  await router.push('/shop')
+async function goOnlineStore(): Promise<void> {
+  await router.push('/online-store')
 }
 
 async function goToCheckout(): Promise<void> {
@@ -387,32 +398,56 @@ async function goToCheckout(): Promise<void> {
 
 <style scoped lang="scss">
 .cart-page {
-  width: min(100%, 1200px);
+  min-height: 100vh;
+}
+
+.page-container {
+  width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
-  padding: 32px 20px 48px;
+}
 
-  &__header {
-    margin-bottom: 24px;
+.cart-hero {
+  padding: 64px 0 48px;
 
-    h1 {
-      margin: 0;
-      color: var(--color-heading);
-      font-size: clamp(28px, 4vw, 36px);
-    }
-
-    p {
-      margin: 8px 0 0;
-      color: var(--color-text-secondary);
-    }
+  &__inner {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    justify-content: space-between;
   }
+
+  h1 {
+    margin: 4px 0 12px;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  &__description {
+    max-width: 620px;
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.cart-content {
+  padding-bottom: 72px;
 }
 
 .cart-state {
   min-height: 360px;
+  border-radius: 16px;
 }
 
 .invalid-cart-alert {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  border-radius: 12px;
 }
 
 .cart-layout {
@@ -422,8 +457,9 @@ async function goToCheckout(): Promise<void> {
   align-items: start;
 }
 
-.cart-items-card {
-  min-width: 0;
+.cart-items-card,
+.cart-summary :deep(.app-card) {
+  border-radius: 16px;
 }
 
 .cart-item {
@@ -450,7 +486,8 @@ async function goToCheckout(): Promise<void> {
   &__image {
     width: 112px;
     height: 88px;
-    border-radius: var(--radius-md);
+    overflow: hidden;
+    border-radius: 12px;
   }
 
   &__image-error {
@@ -459,8 +496,8 @@ async function goToCheckout(): Promise<void> {
     height: 100%;
     padding: 8px;
     place-items: center;
-    color: var(--color-text-secondary);
     background: var(--color-background);
+    color: var(--color-text-secondary);
     font-size: 12px;
     text-align: center;
   }
@@ -473,15 +510,15 @@ async function goToCheckout(): Promise<void> {
     display: inline-block;
     overflow: hidden;
     max-width: 100%;
-    color: var(--el-color-primary);
-    font-size: 17px;
+    color: var(--color-heading);
+    font-size: 1.05rem;
     font-weight: 700;
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
 
     &:hover {
-      text-decoration: underline;
+      color: var(--bs-primary);
     }
   }
 
@@ -509,6 +546,10 @@ async function goToCheckout(): Promise<void> {
     strong {
       color: var(--color-heading);
     }
+  }
+
+  &__remove {
+    border-radius: 8px;
   }
 }
 
@@ -548,7 +589,7 @@ async function goToCheckout(): Promise<void> {
 
     dt,
     dd {
-      color: var(--el-color-primary);
+      color: var(--bs-primary);
       font-size: 18px;
       font-weight: 700;
     }
@@ -564,6 +605,7 @@ async function goToCheckout(): Promise<void> {
 .summary-button {
   width: 100%;
   margin-left: 0;
+  border-radius: 8px;
 }
 
 .summary-hint {
@@ -609,9 +651,17 @@ async function goToCheckout(): Promise<void> {
   }
 }
 
-@media (max-width: 560px) {
-  .cart-page {
-    padding: 24px 12px 40px;
+@media (max-width: 640px) {
+  .page-container {
+    width: min(100%, calc(100% - 32px));
+  }
+
+  .cart-hero {
+    padding: 40px 0 32px;
+  }
+
+  .cart-content {
+    padding-bottom: 48px;
   }
 
   .cart-item {

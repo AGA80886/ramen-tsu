@@ -11,8 +11,12 @@ import routerArticle from './routes/article'
 import routerArticleComment from './routes/articleComment'
 import routerArticleLike from './routes/articleLike'
 import routerArticleFavorite from './routes/articleFavorite'
+import routerShop from './routes/shop'
+import adminShopRouter from './routes/adminShop'
 import middlewareError from './middlewares/error'
 import './configs/passport'
+import './models/shopLike'
+import './models/shopFavorite'
 
 const app = express()
 
@@ -56,6 +60,8 @@ app.use('/article', routerArticle)
 app.use('/article', routerArticleComment)
 app.use('/article', routerArticleLike)
 app.use('/article', routerArticleFavorite)
+app.use('/shop', routerShop)
+app.use('/admin/shop', adminShopRouter)
 app.use(middlewareError)
 
 async function startServer(): Promise<void> {

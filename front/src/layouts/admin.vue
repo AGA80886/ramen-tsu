@@ -89,6 +89,16 @@
           </template>
         </el-menu-item>
 
+        <el-menu-item index="/admin/shops">
+          <el-icon>
+            <Shop />
+          </el-icon>
+
+          <template #title>
+            店家管理
+          </template>
+        </el-menu-item>
+
         <el-menu-item index="/">
           <el-icon>
             <HomeFilled />
@@ -195,6 +205,7 @@ import {
   Fold,
   Goods,
   HomeFilled,
+  Shop,
   Tickets,
   User,
   UserFilled,
@@ -221,6 +232,7 @@ const pageTitles: Record<string, string> = {
   '/admin/products/create': '新增商品',
   '/admin/orders': '訂單管理',
   '/admin/articles': '文章管理',
+  '/admin/shops': '店家管理',
 }
 
 const currentPageTitle = computed(() => {

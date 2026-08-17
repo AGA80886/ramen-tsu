@@ -15,56 +15,79 @@
           </p>
         </div>
 
-        <AppButton
-          type="primary"
+        <button
+          type="button"
+          class="btn btn-primary"
           @click="goToCreateArticle"
         >
-          發表文章
-        </AppButton>
+          投稿文章
+        </button>
       </div>
     </section>
 
     <section class="page-container articles-content">
       <div class="articles-toolbar">
-        <el-input
-          v-model="search"
-          clearable
-          placeholder="搜尋文章"
-          class="articles-search"
-        >
-          <template #prefix>
-            <el-icon>
-              <Search />
-            </el-icon>
-          </template>
-        </el-input>
+        <div class="articles-search">
+          <label
+            for="article-keyword"
+            class="form-label"
+          >
+            搜尋文章
+          </label>
+
+          <input
+            id="article-keyword"
+            v-model="search"
+            type="search"
+            class="form-control"
+            placeholder="搜尋文章標題、摘要或分類"
+          />
+        </div>
 
         <div class="category-filter">
-          <el-button
-            :type="
+          <button
+            type="button"
+            class="btn"
+            :class="
               selectedCategory === ''
-                ? 'primary'
-                : 'default'
+                ? 'btn-primary'
+                : 'btn-outline-secondary'
             "
-            round
             @click="selectedCategory = ''"
           >
             全部
-          </el-button>
+          </button>
 
-          <el-button
+          <button
             v-for="category in categoryOptions"
             :key="category"
-            :type="
+            type="button"
+            class="btn"
+            :class="
               selectedCategory === category
-                ? 'primary'
-                : 'default'
+                ? 'btn-primary'
+                : 'btn-outline-secondary'
             "
-            round
             @click="selectedCategory = category"
           >
             {{ category }}
-          </el-button>
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline-secondary category-filter__reset"
+            @click="resetFilters"
+          >
+            清除篩選
+          </button>
+        </div>
+
+        <div class="articles-toolbar__result">
+          找到
+          <strong>
+            {{ filteredArticles.length }}
+          </strong>
+          篇文章
         </div>
       </div>
 
@@ -123,12 +146,9 @@
                 </template>
               </el-image>
 
-              <el-tag
-                class="article-card__category"
-                effect="dark"
-              >
+              <span class="article-card__category">
                 {{ article.category }}
-              </el-tag>
+              </span>
             </div>
 
             <div class="article-card__body">
@@ -154,10 +174,6 @@
                 <span>
                   閱讀文章
                 </span>
-
-                <el-icon>
-                  <ArrowRight />
-                </el-icon>
               </div>
             </div>
           </article>
@@ -173,10 +189,6 @@ import type {
   TArticleCategory,
 } from '@/types/article'
 
-import {
-  ArrowRight,
-  Search,
-} from '@element-plus/icons-vue'
 import {
   computed,
   ref,
@@ -229,6 +241,11 @@ const categoryOptions: TArticleCategory[] = [
   '即食拉麵',
   '其他',
 ]
+
+const resetFilters = () => {
+  search.value = ''
+  selectedCategory.value = ''
+}
 
 const filteredArticles = computed(() => {
   const keyword = search.value
@@ -366,21 +383,73 @@ Promise<void> {
   flex-direction: column;
   gap: 20px;
   margin-bottom: 32px;
+
+  &__result {
+    text-align: center;
+    color:
+      var(--color-text-secondary);
+    font-size: 0.9rem;
+  }
 }
 
 .articles-search {
   width: min(100%, 480px);
   margin: 0 auto;
+
+  .form-label {
+    display: block;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: 600;
+  }
 }
 
 .category-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   justify-content: center;
 
-  :deep(.el-button) {
-    margin-left: 0;
+  .btn {
+    min-width: 92px;
+  }
+
+  &__reset {
+    min-width: 110px;
+  }
+}
+
+/*
+ * 與拉麵店家頁一致：
+ * 按鈕 hover / focus 交由 Bootstrap 的 btn 樣式處理，
+ * 不另外改寫背景色、文字色或 transform。
+ */
+.articles-page {
+  .btn-primary,
+  .btn-outline-secondary {
+    transition:
+      color 0.15s ease-in-out,
+      background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out,
+      box-shadow 0.15s ease-in-out;
+  }
+
+  .btn-primary:hover,
+  .btn-primary:focus-visible {
+    color: var(--bs-btn-hover-color);
+    background-color:
+      var(--bs-btn-hover-bg);
+    border-color:
+      var(--bs-btn-hover-border-color);
+  }
+
+  .btn-outline-secondary:hover,
+  .btn-outline-secondary:focus-visible {
+    color: var(--bs-btn-hover-color);
+    background-color:
+      var(--bs-btn-hover-bg);
+    border-color:
+      var(--bs-btn-hover-border-color);
   }
 }
 
@@ -442,6 +511,13 @@ Promise<void> {
     position: absolute;
     top: 14px;
     left: 14px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background:
+      rgb(0 0 0 / 68%);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
   }
 
   &__body {
@@ -524,6 +600,15 @@ Promise<void> {
 
   .articles-content {
     padding-bottom: 48px;
+  }
+
+  .category-filter {
+    align-items: stretch;
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
   }
 
   .articles-grid {

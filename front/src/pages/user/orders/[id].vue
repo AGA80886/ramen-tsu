@@ -1,191 +1,200 @@
 <template>
-  <section class="order-detail-page">
-    <header class="order-detail-page__header">
-      <div>
-        <h1>訂單詳情</h1>
-        <p>查看這筆訂單的完整資訊與商品明細。</p>
-      </div>
-    </header>
-
-    <AppLoading
-      :loading="isLoading"
-      text="正在載入訂單..."
-      min-height="360px"
-    >
-      <!-- API Error -->
-      <AppCard
-        v-if="error"
-        class="order-state-card"
-      >
-        <AppEmpty description="無法取得訂單資料">
-          <AppButton
-            type="primary"
-            :loading="isReloading"
-            @click="reloadOrders"
-          >
-            重新載入
-          </AppButton>
-        </AppEmpty>
-      </AppCard>
-
-      <!-- Order Not Found -->
-      <AppCard
-        v-else-if="!order"
-        class="order-state-card"
-      >
-        <AppEmpty description="找不到這筆訂單">
-          <AppButton
-            type="primary"
-            @click="goToOrders"
-          >
-            返回我的訂單
-          </AppButton>
-        </AppEmpty>
-      </AppCard>
-
-      <!-- Order Detail -->
-      <template v-else>
-        <div class="detail-layout">
-          <div class="detail-main">
-            <!-- 訂單資訊 -->
-            <AppCard title="訂單資訊">
-              <dl class="order-info">
-                <div>
-                  <dt>訂單編號</dt>
-                  <dd>{{ order._id }}</dd>
-                </div>
-
-                <div>
-                  <dt>建立時間</dt>
-                  <dd>{{ formatDate(order.createdAt) }}</dd>
-                </div>
-
-                <div>
-                  <dt>最後更新</dt>
-                  <dd>{{ formatDate(order.updatedAt) }}</dd>
-                </div>
-
-                <div>
-                  <dt>訂單狀態</dt>
-                  <dd>
-                    <el-tag
-                      :type="orderStatusType(order.status)"
-                      effect="light"
-                    >
-                      {{ orderStatusText(order.status) }}
-                    </el-tag>
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>付款狀態</dt>
-                  <dd>
-                    <el-tag
-                      :type="
-                        paymentStatusType(
-                          order.paymentStatus,
-                        )
-                      "
-                      effect="light"
-                    >
-                      {{
-                        paymentStatusText(
-                          order.paymentStatus,
-                        )
-                      }}
-                    </el-tag>
-                  </dd>
-                </div>
-              </dl>
-            </AppCard>
-
-            <!-- 商品明細 -->
-            <AppCard title="商品明細">
-              <article
-                v-for="item in order.items"
-                :key="`${order._id}-${item.product}`"
-                class="order-item"
-              >
-                <el-image
-                  class="order-item__image"
-                  fit="cover"
-                  :src="item.imageUrl || ''"
-                >
-                  <template #error>
-                    <div class="order-item__image-error">
-                      圖片載入失敗
-                    </div>
-                  </template>
-                </el-image>
-
-                <div class="order-item__content">
-                  <h2>{{ item.name }}</h2>
-
-                  <p>
-                    成交單價：
-                    {{ formatCurrency(item.price) }}
-                  </p>
-                </div>
-
-                <div class="order-item__quantity">
-                  <span>數量</span>
-                  <strong>{{ item.quantity }}</strong>
-                </div>
-
-                <div class="order-item__subtotal">
-                  <span>小計</span>
-                  <strong>
-                    {{ formatCurrency(item.subtotal) }}
-                  </strong>
-                </div>
-              </article>
-            </AppCard>
-          </div>
-
-          <!-- 訂單摘要 -->
-          <aside class="order-summary">
-            <AppCard title="訂單摘要">
-              <dl class="summary-list">
-                <div>
-                  <dt>商品種類</dt>
-                  <dd>{{ order.items.length }}</dd>
-                </div>
-
-                <div>
-                  <dt>商品總數</dt>
-                  <dd>{{ totalQuantity }}</dd>
-                </div>
-
-                <div class="summary-list__total">
-                  <dt>訂單總金額</dt>
-                  <dd>
-                    {{ formatCurrency(order.totalPrice) }}
-                  </dd>
-                </div>
-              </dl>
-
-              <div class="summary-actions">
-                <AppButton
-                  class="summary-button"
-                  type="primary"
-                  @click="goToOrders"
-                >
-                  返回我的訂單
-                </AppButton>
-
-                <AppButton
-                  class="summary-button"
-                  @click="goShopping"
-                >
-                  繼續購物
-                </AppButton>
-              </div>
-            </AppCard>
-          </aside>
+  <main class="order-detail-page">
+    <section class="order-detail-hero">
+      <div class="page-container order-detail-hero__inner">
+        <div>
+          <p class="eyebrow">
+            ORDER DETAIL
+          </p>
+          <h1>訂單詳情</h1>
+          <p class="order-detail-hero__description">
+            查看這筆訂單的完整資訊、商品明細與付款狀態。
+          </p>
         </div>
-      </template>
-    </AppLoading>
-  </section>
+      </div>
+    </section>
+
+    <section class="page-container order-detail-content">
+      <AppLoading
+        :loading="isLoading"
+        text="正在載入訂單..."
+        min-height="360px"
+      >
+        <!-- API Error -->
+        <AppCard
+          v-if="error"
+          class="order-state-card"
+        >
+          <AppEmpty description="無法取得訂單資料">
+            <AppButton
+              type="primary"
+              :loading="isReloading"
+              @click="reloadOrders"
+            >
+              重新載入
+            </AppButton>
+          </AppEmpty>
+        </AppCard>
+
+        <!-- Order Not Found -->
+        <AppCard
+          v-else-if="!order"
+          class="order-state-card"
+        >
+          <AppEmpty description="找不到這筆訂單">
+            <AppButton
+              type="primary"
+              @click="goToOrders"
+            >
+              返回我的訂單
+            </AppButton>
+          </AppEmpty>
+        </AppCard>
+
+        <!-- Order Detail -->
+        <template v-else>
+          <div class="detail-layout">
+            <div class="detail-main">
+              <!-- 訂單資訊 -->
+              <AppCard title="訂單資訊">
+                <dl class="order-info">
+                  <div>
+                    <dt>訂單編號</dt>
+                    <dd>{{ order._id }}</dd>
+                  </div>
+
+                  <div>
+                    <dt>建立時間</dt>
+                    <dd>{{ formatDate(order.createdAt) }}</dd>
+                  </div>
+
+                  <div>
+                    <dt>最後更新</dt>
+                    <dd>{{ formatDate(order.updatedAt) }}</dd>
+                  </div>
+
+                  <div>
+                    <dt>訂單狀態</dt>
+                    <dd>
+                      <el-tag
+                        :type="orderStatusType(order.status)"
+                        effect="light"
+                      >
+                        {{ orderStatusText(order.status) }}
+                      </el-tag>
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>付款狀態</dt>
+                    <dd>
+                      <el-tag
+                        :type="
+                          paymentStatusType(
+                            order.paymentStatus,
+                          )
+                        "
+                        effect="light"
+                      >
+                        {{
+                          paymentStatusText(
+                            order.paymentStatus,
+                          )
+                        }}
+                      </el-tag>
+                    </dd>
+                  </div>
+                </dl>
+              </AppCard>
+
+              <!-- 商品明細 -->
+              <AppCard title="商品明細">
+                <article
+                  v-for="item in order.items"
+                  :key="`${order._id}-${item.product}`"
+                  class="order-item"
+                >
+                  <el-image
+                    class="order-item__image"
+                    fit="cover"
+                    :src="item.imageUrl || ''"
+                  >
+                    <template #error>
+                      <div class="order-item__image-error">
+                        圖片載入失敗
+                      </div>
+                    </template>
+                  </el-image>
+
+                  <div class="order-item__content">
+                    <h2>{{ item.name }}</h2>
+
+                    <p>
+                      成交單價：
+                      {{ formatCurrency(item.price) }}
+                    </p>
+                  </div>
+
+                  <div class="order-item__quantity">
+                    <span>數量</span>
+                    <strong>{{ item.quantity }}</strong>
+                  </div>
+
+                  <div class="order-item__subtotal">
+                    <span>小計</span>
+                    <strong>
+                      {{ formatCurrency(item.subtotal) }}
+                    </strong>
+                  </div>
+                </article>
+              </AppCard>
+            </div>
+
+            <!-- 訂單摘要 -->
+            <aside class="order-summary">
+              <AppCard title="訂單摘要">
+                <dl class="summary-list">
+                  <div>
+                    <dt>商品種類</dt>
+                    <dd>{{ order.items.length }}</dd>
+                  </div>
+
+                  <div>
+                    <dt>商品總數</dt>
+                    <dd>{{ totalQuantity }}</dd>
+                  </div>
+
+                  <div class="summary-list__total">
+                    <dt>訂單總金額</dt>
+                    <dd>
+                      {{ formatCurrency(order.totalPrice) }}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div class="summary-actions">
+                  <AppButton
+                    class="summary-button"
+                    type="primary"
+                    @click="goToOrders"
+                  >
+                    返回我的訂單
+                  </AppButton>
+
+                  <AppButton
+                    class="summary-button"
+                    @click="goShopping"
+                  >
+                    繼續購物
+                  </AppButton>
+                </div>
+              </AppCard>
+            </aside>
+          </div>
+        </template>
+      </AppLoading>
+    </section>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -351,28 +360,51 @@ meta:
 
 <style scoped lang="scss">
 .order-detail-page {
-  width: min(100%, 1200px);
+  min-height: 100vh;
+}
+
+.page-container {
+  width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
-  padding: 32px 20px 48px;
+}
 
-  &__header {
-    margin-bottom: 24px;
+.order-detail-hero {
+  padding: 64px 0 48px;
 
-    h1 {
-      margin: 0;
-      color: var(--color-heading);
-      font-size: clamp(28px, 4vw, 36px);
-    }
-
-    p {
-      margin: 8px 0 0;
-      color: var(--color-text-secondary);
-    }
+  &__inner {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    justify-content: space-between;
   }
+
+  h1 {
+    margin: 4px 0 12px;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  &__description {
+    max-width: 620px;
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.order-detail-content {
+  padding-bottom: 72px;
 }
 
 .order-state-card {
   min-height: 360px;
+  border-radius: 16px;
 }
 
 .detail-layout {
@@ -385,6 +417,12 @@ meta:
 .detail-main {
   display: grid;
   gap: 24px;
+}
+
+.detail-main :deep(.app-card),
+.order-summary :deep(.app-card) {
+  overflow: hidden;
+  border-radius: 16px;
 }
 
 .order-info {
@@ -420,9 +458,7 @@ meta:
 
 .order-item {
   display: grid;
-  grid-template-columns:
-    96px minmax(180px, 1fr)
-    80px 140px;
+  grid-template-columns: 96px minmax(180px, 1fr) 80px 140px;
   gap: 16px;
   padding: 16px 0;
   align-items: center;
@@ -440,7 +476,8 @@ meta:
   &__image {
     width: 96px;
     height: 80px;
-    border-radius: var(--radius-md);
+    overflow: hidden;
+    border-radius: 12px;
   }
 
   &__image-error {
@@ -519,7 +556,7 @@ meta:
 
     dt,
     dd {
-      color: var(--el-color-primary);
+      color: var(--bs-primary);
       font-size: 1.125rem;
       font-weight: 700;
     }
@@ -535,6 +572,7 @@ meta:
 .summary-button {
   width: 100%;
   margin-left: 0;
+  border-radius: 8px;
 }
 
 @media (max-width: 900px) {
@@ -548,11 +586,9 @@ meta:
 }
 
 @media (max-width: 680px) {
-  .order-info {
-    > div {
-      grid-template-columns: 1fr;
-      gap: 4px;
-    }
+  .order-info > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .order-item {
@@ -573,9 +609,17 @@ meta:
   }
 }
 
-@media (max-width: 480px) {
-  .order-detail-page {
-    padding: 24px 12px 40px;
+@media (max-width: 640px) {
+  .page-container {
+    width: min(100%, calc(100% - 32px));
+  }
+
+  .order-detail-hero {
+    padding: 40px 0 32px;
+  }
+
+  .order-detail-content {
+    padding-bottom: 48px;
   }
 
   .order-item {

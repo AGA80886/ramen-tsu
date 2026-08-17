@@ -845,15 +845,6 @@ function articleStatusType(
 }
 </script>
 
-<route lang="yaml">
-meta:
-  layout: admin
-  access: authenticated
-  roles:
-    - admin
-  title: 文章管理
-</route>
-
 <style scoped lang="scss">
 .admin-articles-page {
   padding: 24px;
@@ -974,3 +965,12 @@ meta:
   }
 }
 </style>
+
+<route lang="yaml">
+meta:
+  layout: admin
+  access: authenticated
+  roles:
+    - admin
+  title: 文章管理
+</route>

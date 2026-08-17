@@ -1,183 +1,192 @@
 <template>
-  <section class="orders-page">
-    <header class="orders-page__header">
-      <div>
-        <h1>我的訂單</h1>
-        <p>查看你過去建立的訂單與商品明細。</p>
+  <main class="orders-page">
+    <section class="orders-hero">
+      <div class="page-container orders-hero__inner">
+        <div>
+          <p class="eyebrow">
+            MY ORDERS
+          </p>
+          <h1>我的訂單</h1>
+          <p class="orders-hero__description">
+            查看你過去建立的訂單、商品明細與付款狀態。
+          </p>
+        </div>
       </div>
-    </header>
+    </section>
 
-    <AppLoading
-      :loading="isLoading"
-      text="正在載入訂單..."
-      min-height="360px"
-    >
-      <!-- API Error -->
-      <AppCard
-        v-if="error"
-        class="orders-state-card"
+    <section class="page-container orders-content">
+      <AppLoading
+        :loading="isLoading"
+        text="正在載入訂單..."
+        min-height="360px"
       >
-        <AppEmpty description="無法取得訂單資料">
-          <AppButton
-            type="primary"
-            :loading="isReloading"
-            @click="reloadOrders"
-          >
-            重新載入
-          </AppButton>
-        </AppEmpty>
-      </AppCard>
-
-      <!-- Empty -->
-      <AppCard
-        v-else-if="orders.length === 0"
-        class="orders-state-card"
-      >
-        <AppEmpty description="目前還沒有訂單">
-          <AppButton
-            type="primary"
-            @click="goShopping"
-          >
-            前往購物
-          </AppButton>
-        </AppEmpty>
-      </AppCard>
-
-      <!-- Orders -->
-      <el-collapse
-        v-else
-        v-model="activeOrders"
-        class="orders-list"
-      >
-        <el-collapse-item
-          v-for="order in orders"
-          :key="order._id"
-          :name="order._id"
+        <!-- API Error -->
+        <AppCard
+          v-if="error"
+          class="orders-state-card"
         >
-          <template #title>
-            <div class="order-summary">
-              <div class="order-summary__main">
-                <strong class="order-summary__id">
-                  訂單 #{{ shortOrderId(order._id) }}
-                </strong>
+          <AppEmpty description="無法取得訂單資料">
+            <AppButton
+              type="primary"
+              :loading="isReloading"
+              @click="reloadOrders"
+            >
+              重新載入
+            </AppButton>
+          </AppEmpty>
+        </AppCard>
 
-                <span class="order-summary__date">
-                  {{ formatDate(order.createdAt) }}
-                </span>
+        <!-- Empty -->
+        <AppCard
+          v-else-if="orders.length === 0"
+          class="orders-state-card"
+        >
+          <AppEmpty description="目前還沒有訂單">
+            <AppButton
+              type="primary"
+              @click="goShopping"
+            >
+              前往購物
+            </AppButton>
+          </AppEmpty>
+        </AppCard>
+
+        <!-- Orders -->
+        <el-collapse
+          v-else
+          v-model="activeOrders"
+          class="orders-list"
+        >
+          <el-collapse-item
+            v-for="order in orders"
+            :key="order._id"
+            :name="order._id"
+          >
+            <template #title>
+              <div class="order-summary">
+                <div class="order-summary__main">
+                  <strong class="order-summary__id">
+                    訂單 #{{ shortOrderId(order._id) }}
+                  </strong>
+
+                  <span class="order-summary__date">
+                    {{ formatDate(order.createdAt) }}
+                  </span>
+                </div>
+
+                <div class="order-summary__meta">
+                  <el-tag
+                    :type="orderStatusType(order.status)"
+                    effect="light"
+                  >
+                    {{ orderStatusText(order.status) }}
+                  </el-tag>
+
+                  <el-tag
+                    :type="
+                      paymentStatusType(
+                        order.paymentStatus,
+                      )
+                    "
+                    effect="light"
+                  >
+                    {{
+                      paymentStatusText(
+                        order.paymentStatus,
+                      )
+                    }}
+                  </el-tag>
+
+                  <span class="order-summary__quantity">
+                    {{ order.items.length }} 種 /
+                    {{ getTotalQuantity(order) }} 件
+                  </span>
+
+                  <strong class="order-summary__price">
+                    {{ formatCurrency(order.totalPrice) }}
+                  </strong>
+                </div>
+              </div>
+            </template>
+
+            <div class="order-detail">
+              <div class="order-detail__info">
+                <p>
+                  <span>完整訂單編號</span>
+                  <strong>{{ order._id }}</strong>
+                </p>
+
+                <p>
+                  <span>建立時間</span>
+                  <strong>
+                    {{ formatDate(order.createdAt) }}
+                  </strong>
+                </p>
               </div>
 
-              <div class="order-summary__meta">
-                <el-tag
-                  :type="orderStatusType(order.status)"
-                  effect="light"
+              <div class="order-items">
+                <article
+                  v-for="item in order.items"
+                  :key="`${order._id}-${item.product}`"
+                  class="order-item"
                 >
-                  {{ orderStatusText(order.status) }}
-                </el-tag>
+                  <el-image
+                    class="order-item__image"
+                    fit="cover"
+                    :src="item.imageUrl"
+                  >
+                    <template #error>
+                      <div class="order-item__image-error">
+                        圖片載入失敗
+                      </div>
+                    </template>
+                  </el-image>
 
-                <el-tag
-                  :type="
-                    paymentStatusType(
-                      order.paymentStatus,
-                    )
-                  "
-                  effect="light"
-                >
-                  {{
-                    paymentStatusText(
-                      order.paymentStatus,
-                    )
-                  }}
-                </el-tag>
+                  <div class="order-item__content">
+                    <h2>{{ item.name }}</h2>
 
-                <span class="order-summary__quantity">
-                  {{ order.items.length }} 種 /
-                  {{ getTotalQuantity(order) }} 件
-                </span>
+                    <p>
+                      成交單價：
+                      {{ formatCurrency(item.price) }}
+                    </p>
+                  </div>
 
-                <strong class="order-summary__price">
+                  <div class="order-item__quantity">
+                    <span>數量</span>
+                    <strong>{{ item.quantity }}</strong>
+                  </div>
+
+                  <div class="order-item__subtotal">
+                    <span>小計</span>
+                    <strong>
+                      {{ formatCurrency(item.subtotal) }}
+                    </strong>
+                  </div>
+                </article>
+              </div>
+
+              <div class="order-detail__total">
+                <span>訂單總金額</span>
+                <strong>
                   {{ formatCurrency(order.totalPrice) }}
                 </strong>
               </div>
-            </div>
-          </template>
 
-          <div class="order-detail">
-            <div class="order-detail__info">
-              <p>
-                <span>完整訂單編號</span>
-                <strong>{{ order._id }}</strong>
-              </p>
-
-              <p>
-                <span>建立時間</span>
-                <strong>
-                  {{ formatDate(order.createdAt) }}
-                </strong>
-              </p>
-            </div>
-
-            <div class="order-items">
-              <article
-                v-for="item in order.items"
-                :key="`${order._id}-${item.product}`"
-                class="order-item"
-              >
-                <el-image
-                  class="order-item__image"
-                  fit="cover"
-                  :src="item.imageUrl"
+              <div class="order-detail__actions">
+                <AppButton
+                  type="primary"
+                  plain
+                  @click="goToOrderDetail(order._id)"
                 >
-                  <template #error>
-                    <div class="order-item__image-error">
-                      圖片載入失敗
-                    </div>
-                  </template>
-                </el-image>
-
-                <div class="order-item__content">
-                  <h2>{{ item.name }}</h2>
-
-                  <p>
-                    成交單價：
-                    {{ formatCurrency(item.price) }}
-                  </p>
-                </div>
-
-                <div class="order-item__quantity">
-                  <span>數量</span>
-                  <strong>{{ item.quantity }}</strong>
-                </div>
-
-                <div class="order-item__subtotal">
-                  <span>小計</span>
-                  <strong>
-                    {{ formatCurrency(item.subtotal) }}
-                  </strong>
-                </div>
-              </article>
+                  查看詳情
+                </AppButton>
+              </div>
             </div>
-
-            <div class="order-detail__total">
-              <span>訂單總金額</span>
-              <strong>
-                {{ formatCurrency(order.totalPrice) }}
-              </strong>
-            </div>
-
-            <div class="order-detail__actions">
-              <AppButton
-                type="primary"
-                plain
-                @click="goToOrderDetail(order._id)"
-              >
-                查看詳情
-              </AppButton>
-            </div>
-          </div>
-        </el-collapse-item>
-      </el-collapse>
-    </AppLoading>
-  </section>
+          </el-collapse-item>
+        </el-collapse>
+      </AppLoading>
+    </section>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -338,50 +347,83 @@ meta:
 
 <style scoped lang="scss">
 .orders-page {
-  width: min(100%, 1200px);
+  min-height: 100vh;
+}
+
+.page-container {
+  width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
-  padding: 32px 20px 48px;
+}
 
-  &__header {
-    margin-bottom: 24px;
+.orders-hero {
+  padding: 64px 0 48px;
 
-    h1 {
-      margin: 0;
-      color: var(--color-heading);
-      font-size: clamp(28px, 4vw, 36px);
-    }
-
-    p {
-      margin: 8px 0 0;
-      color: var(--color-text-secondary);
-    }
+  &__inner {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    justify-content: space-between;
   }
+
+  h1 {
+    margin: 4px 0 12px;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  &__description {
+    max-width: 620px;
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.orders-content {
+  padding-bottom: 72px;
 }
 
 .orders-state-card {
   min-height: 360px;
+  border-radius: 16px;
 }
 
 .orders-list {
   border-top: 0;
 
   :deep(.el-collapse-item) {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     overflow: hidden;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--el-bg-color);
+    border-radius: 16px;
+    background: var(--color-surface);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  :deep(.el-collapse-item:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgb(0 0 0 / 7%);
   }
 
   :deep(.el-collapse-item__header) {
     height: auto;
-    min-height: 88px;
-    padding: 16px 20px;
+    min-height: 92px;
+    padding: 18px 20px;
     border-bottom: 0;
+    background: transparent;
   }
 
   :deep(.el-collapse-item__wrap) {
     border-bottom: 0;
+    background: transparent;
   }
 
   :deep(.el-collapse-item__content) {
@@ -425,7 +467,7 @@ meta:
 
   &__price {
     min-width: 100px;
-    color: var(--el-color-primary);
+    color: var(--bs-primary);
     font-size: 1.05rem;
     text-align: right;
   }
@@ -467,7 +509,7 @@ meta:
     }
 
     strong {
-      color: var(--el-color-primary);
+      color: var(--bs-primary);
       font-size: 1.125rem;
     }
   }
@@ -481,9 +523,7 @@ meta:
 
 .order-item {
   display: grid;
-  grid-template-columns:
-    96px minmax(180px, 1fr)
-    80px 140px;
+  grid-template-columns: 96px minmax(180px, 1fr) 80px 140px;
   gap: 16px;
   padding: 16px 0;
   align-items: center;
@@ -492,7 +532,8 @@ meta:
   &__image {
     width: 96px;
     height: 80px;
-    border-radius: var(--radius-md);
+    overflow: hidden;
+    border-radius: 12px;
   }
 
   &__image-error {
@@ -564,23 +605,27 @@ meta:
   }
 }
 
-@media (max-width: 560px) {
-  .orders-page {
-    padding: 24px 12px 40px;
+@media (max-width: 640px) {
+  .page-container {
+    width: min(100%, calc(100% - 32px));
   }
 
-  .order-detail__info {
-    p {
-      grid-template-columns: 1fr;
-      gap: 2px;
-    }
+  .orders-hero {
+    padding: 40px 0 32px;
   }
 
-  .order-detail__actions {
-    :deep(.el-button) {
-      width: 100%;
-      margin-left: 0;
-    }
+  .orders-content {
+    padding-bottom: 48px;
+  }
+
+  .order-detail__info p {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .order-detail__actions :deep(.el-button) {
+    width: 100%;
+    margin-left: 0;
   }
 
   .order-item {
