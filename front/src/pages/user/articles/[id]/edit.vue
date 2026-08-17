@@ -30,7 +30,7 @@
               type="primary"
               @click="router.push('/user/articles')"
             >
-              返回我的文章
+              返回我發表的文章
             </AppButton>
           </AppEmpty>
         </AppCard>

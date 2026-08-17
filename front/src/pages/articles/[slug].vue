@@ -3,12 +3,12 @@
     <div class="page-container">
       <!-- 返回論壇 -->
       <div class="article-nav">
-        <AppButton
-          plain
-          @click="router.push('/articles')"
+        <RouterLink
+          to="/articles"
+          class="btn btn-outline-secondary"
         >
-          ← 返回拉麵論壇
-        </AppButton>
+          返回拉麵論壇
+        </RouterLink>
       </div>
 
       <AppLoading
@@ -100,6 +100,57 @@
                 }}
               </span>
             </div>
+
+            <div class="article-reactions">
+              <button
+                type="button"
+                class="btn"
+                :class="
+                  likeStatus?.liked
+                    ? 'btn-primary'
+                    : 'btn-outline-primary'
+                "
+                :disabled="
+                  isMutatingLike ||
+                    likeCountLoading
+                "
+                @click="toggleLike"
+              >
+                {{
+                  likeStatus?.liked
+                    ? '♥ 已按讚'
+                    : '♡ 按讚'
+                }}
+                {{ likeCount?.count ?? 0 }}
+              </button>
+
+              <button
+                type="button"
+                class="btn"
+                :class="
+                  favoriteStatus?.favorited
+                    ? 'btn-warning'
+                    : 'btn-outline-secondary'
+                "
+                :disabled="
+                  isMutatingFavorite
+                "
+                @click="toggleFavorite"
+              >
+                {{
+                  favoriteStatus?.favorited
+                    ? '★ 已收藏'
+                    : '☆ 收藏'
+                }}
+              </button>
+            </div>
+
+            <p
+              v-if="!user.isLoggedIn"
+              class="article-reactions__hint"
+            >
+              登入會員後即可按讚與收藏文章。
+            </p>
           </header>
 
           <!-- Cover -->
@@ -133,79 +184,6 @@
             </div>
           </AppCard>
 
-          <div class="article-reactions">
-            <div class="article-reactions__group">
-              <AppButton
-                :type="
-                  likeStatus?.liked
-                    ? 'danger'
-                    : 'default'
-                "
-                :plain="!likeStatus?.liked"
-                :loading="
-                  isMutatingLike ||
-                    likeCountLoading
-                "
-                @click="toggleLike"
-              >
-                <span class="reaction-icon">
-                  {{
-                    likeStatus?.liked
-                      ? '♥'
-                      : '♡'
-                  }}
-                </span>
-
-                <span>
-                  {{
-                    likeStatus?.liked
-                      ? '已按讚'
-                      : '按讚'
-                  }}
-                </span>
-
-                <strong>
-                  {{ likeCount?.count ?? 0 }}
-                </strong>
-              </AppButton>
-
-              <AppButton
-                :type="
-                  favoriteStatus?.favorited
-                    ? 'warning'
-                    : 'default'
-                "
-                :plain="
-                  !favoriteStatus?.favorited
-                "
-                :loading="
-                  isMutatingFavorite
-                "
-                @click="toggleFavorite"
-              >
-                <span class="reaction-icon">
-                  {{
-                    favoriteStatus?.favorited
-                      ? '★'
-                      : '☆'
-                  }}
-                </span>
-
-                {{
-                  favoriteStatus?.favorited
-                    ? '已收藏'
-                    : '收藏'
-                }}
-              </AppButton>
-            </div>
-
-            <p
-              v-if="!user.isLoggedIn"
-              class="article-reactions__hint"
-            >
-              登入後即可按讚與收藏文章。
-            </p>
-          </div>
 
           <section class="comments">
             <div class="comments__header">
@@ -386,16 +364,6 @@
               </div>
             </AppLoading>
           </section>
-
-          <!-- Footer -->
-          <footer class="article__footer">
-            <AppButton
-              plain
-              @click="router.push('/articles')"
-            >
-              ← 返回拉麵論壇
-            </AppButton>
-          </footer>
         </article>
       </AppLoading>
     </div>
@@ -869,11 +837,6 @@ Promise<void> {
 }
 </script>
 
-<route lang="yaml">
-meta:
-  title: 文章內容
-</route>
-
 <style scoped lang="scss">
 .article-detail-page {
   padding: 40px 0 72px;
@@ -1084,38 +1047,20 @@ meta:
 
 .article-reactions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin-top: 20px;
-  padding: 18px 20px;
-  border: 1px solid
-    var(--color-border);
-  border-radius: var(--radius-md);
-  background:
-    var(--color-surface);
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
 
-  &__group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    :deep(.el-button) {
-      margin-left: 0;
-    }
+  .btn {
+    min-width: 124px;
   }
 
   &__hint {
-    margin: 0;
+    margin: 10px 0 0;
     color:
       var(--color-text-secondary);
-    font-size: 0.875rem;
+    font-size: 0.85rem;
   }
-}
-
-.reaction-icon {
-  font-size: 1.15rem;
-  line-height: 1;
 }
 
 @media (max-width: 640px) {
@@ -1150,9 +1095,8 @@ meta:
       line-height: 1.9;
     }
   }
-}
 
-.comments {
+  .comments {
     margin-top: 36px;
 
     &__header {
@@ -1189,22 +1133,16 @@ meta:
   }
 
   .article-reactions {
-    align-items: stretch;
     flex-direction: column;
 
-    &__group {
-      display: grid;
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      :deep(.el-button) {
-        width: 100%;
-      }
-    }
-
-    &__hint {
-      text-align: center;
+    .btn {
+      width: 100%;
     }
   }
-
+}
 </style>
+
+<route lang="yaml">
+meta:
+  title: 文章內容
+</route>

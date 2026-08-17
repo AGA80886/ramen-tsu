@@ -7,7 +7,7 @@
             RAMEN FORUM
           </p>
 
-          <h1>發表文章</h1>
+          <h1>投稿文章</h1>
 
           <p>
             分享你的拉麵食記、知識與最新情報。
@@ -290,12 +290,6 @@ Promise<void> {
 }
 </script>
 
-<route lang="yaml">
-meta:
-  title: 發表文章
-  access: authenticated
-</route>
-
 <style scoped lang="scss">
 .create-article-page {
   padding: 48px 0 72px;
@@ -366,3 +360,9 @@ meta:
   }
 }
 </style>
+
+<route lang="yaml">
+meta:
+  title: 投稿文章
+  access: authenticated
+</route>

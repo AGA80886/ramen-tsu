@@ -40,11 +40,15 @@
               <span>拉麵論壇</span>
             </el-menu-item>
 
+            <el-menu-item index="/shops">
+              <span>拉麵店家</span>
+            </el-menu-item>
+
             <el-menu-item index="/map">
               <span>拉麵地圖</span>
             </el-menu-item>
 
-            <el-menu-item index="/shop">
+            <el-menu-item index="/online-store">
               <span>拉麵商城</span>
             </el-menu-item>
 
@@ -102,7 +106,7 @@
               <el-icon>
                 <Collection />
               </el-icon>
-              <span>訂單</span>
+              <span>我的訂單</span>
             </el-menu-item>
           </el-menu>
 
@@ -179,11 +183,15 @@
                   拉麵論壇
                 </el-dropdown-item>
 
+                <el-dropdown-item command="/shops">
+                  拉麵店家
+                </el-dropdown-item>
+
                 <el-dropdown-item command="/map">
                   拉麵地圖
                 </el-dropdown-item>
 
-                <el-dropdown-item command="/shop">
+                <el-dropdown-item command="/online-store">
                   拉麵商城
                 </el-dropdown-item>
 
