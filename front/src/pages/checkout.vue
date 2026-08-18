@@ -81,8 +81,8 @@
           type="warning"
           :closable="false"
           show-icon
-          title="購物車內有已不存在的商品"
-          description="請返回購物車處理後再進行結帳。"
+          title="購物車內沒有可結帳的商品"
+          description="商品可能已下架或不存在，請返回購物車處理。"
         />
 
         <AppEmpty description="購物車目前沒有可結帳的商品">
@@ -102,9 +102,27 @@
           type="warning"
           :closable="false"
           show-icon
-          :title="`購物車內有 ${invalidItemCount} 項商品已不存在`"
-          description="請返回購物車處理失效商品後再建立訂單。"
-        />
+        >
+          <template #title>
+            購物車內有商品目前無法結帳
+          </template>
+
+          <template #default>
+            <div class="checkout-alert__details">
+              <p v-if="missingItemCount > 0">
+                {{ missingItemCount }} 項商品已不存在。
+              </p>
+
+              <p v-if="unavailableItemCount > 0">
+                {{ unavailableItemCount }} 項商品已下架。
+              </p>
+
+              <p>
+                請返回購物車移除失效商品後再建立訂單。
+              </p>
+            </div>
+          </template>
+        </el-alert>
 
         <div class="checkout-layout">
           <AppCard
@@ -198,7 +216,11 @@
 import type { ValidCartItem } from '@/types/cart'
 import type { IOrder, OrderStatus, PaymentStatus } from '@/types/order'
 
-import { computed, ref } from 'vue'
+import {
+  computed,
+  onMounted,
+  ref,
+} from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useCartItemsQuery } from '@/queries/cart'
@@ -223,14 +245,37 @@ const status = ref<CheckoutStatus>('confirm')
 const createdOrder = ref<IOrder | null>(null)
 const isReloading = ref(false)
 
+onMounted(async () => {
+  await refetch()
+})
+
 const validCartItems = computed<ValidCartItem[]>(() => {
   return (cartItems.value ?? []).filter(
-    (item): item is ValidCartItem => item.product !== null,
+    (item): item is ValidCartItem =>
+      item.product !== null
+      && item.product.sell,
   )
 })
 
+const missingItemCount = computed(() => {
+  return (cartItems.value ?? []).filter(
+    item => item.product === null,
+  ).length
+})
+
+const unavailableItemCount = computed(() => {
+  return (cartItems.value ?? []).filter(
+    item =>
+      item.product !== null
+      && !item.product.sell,
+  ).length
+})
+
 const invalidItemCount = computed(() => {
-  return (cartItems.value ?? []).filter(item => item.product === null).length
+  return (
+    missingItemCount.value
+    + unavailableItemCount.value
+  )
 })
 
 const totalQuantity = computed(() => {
@@ -324,12 +369,6 @@ async function goShopping(): Promise<void> {
   await router.push('/')
 }
 </script>
-
-<route lang="yaml">
-meta:
-  access: authenticated
-  title: 確認訂單
-</route>
 
 <style scoped lang="scss">
 .checkout-page {
@@ -516,6 +555,15 @@ meta:
   }
 }
 
+.checkout-alert__details {
+  display: grid;
+  gap: 4px;
+
+  p {
+    margin: 0;
+  }
+}
+
 @media (max-width: 980px) {
   .checkout-layout { grid-template-columns: 1fr; }
   .checkout-summary { position: static; }
@@ -556,3 +604,9 @@ meta:
   }
 }
 </style>
+
+<route lang="yaml">
+meta:
+  access: authenticated
+  title: 確認訂單
+</route>

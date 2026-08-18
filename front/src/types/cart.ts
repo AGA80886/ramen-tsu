@@ -1,4 +1,4 @@
-import type { IProduct } from './product'
+import type { IProduct } from './products'
 
 export interface CartForm {
   product: string

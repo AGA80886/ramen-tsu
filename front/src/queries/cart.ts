@@ -11,8 +11,6 @@ import {
 import * as cartService from '@/services/cart'
 import { useUserStore } from '@/stores/user'
 
-const STALE_TIME = 1000 * 60 * 5
-
 export const cartKeys = {
   all: ['cart'] as const,
 
@@ -56,28 +54,17 @@ export const useAddCartItemMutation =
     })
   })
 
-export const useCartItemsQuery =
-  defineQuery(() => {
-    const user = useUserStore()
+export const useCartItemsQuery = defineQuery(() => {
+  return useQuery({
+    key: ['cart'],
 
-    return useQuery({
-      key: () =>
-        cartKeys.mine(
-          user.account,
-        ),
+    query: async () => {
+      const { data } =
+        await cartService.getCartItems()
 
-      query: async () => {
-        const { data } =
-          await cartService
-            .getCartItems()
+      return data.result
+    },
 
-        return data.result
-      },
-
-      enabled: () =>
-        user.isLoggedIn &&
-        Boolean(user.account),
-
-      staleTime: STALE_TIME,
-    })
+    staleTime: 0,
   })
+})
