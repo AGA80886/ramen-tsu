@@ -290,6 +290,21 @@
         <router-view :key="route.fullPath" />
       </el-main>
     </el-container>
+
+    <!-- Footer -->
+    <el-footer class="site-footer">
+      <div class="footer-inner">
+        <p class="copyright">
+          © 2026 許庭嘉（TING-CHIA HSU）. All Rights Reserved.
+        </p>
+
+        <p class="portfolio-disclaimer">
+          本網站為非營利性質，僅作為網頁全端工程師作品集使用。
+          <br />
+          This website is non-profit and is intended solely as a portfolio for a Full-Stack Web Developer.
+        </p>
+      </div>
+    </el-footer>
   </el-container>
 </template>
 
@@ -558,7 +573,8 @@ async function goToProfile(): Promise<void> {
 /* 主內容 */
 
 .body-layout {
-  min-height: calc(100vh - 100px);
+  flex: 1;
+  min-height: 0;
 }
 
 .site-main {
@@ -567,6 +583,40 @@ async function goToProfile(): Promise<void> {
   padding: 24px;
   box-sizing: border-box;
   background-color: var(--color-background);
+}
+
+
+/* Footer */
+
+.site-footer {
+  height: auto;
+  padding: 20px 24px;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.footer-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-inner p {
+  margin: 0;
+}
+
+.copyright {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.portfolio-disclaimer {
+  margin-top: 8px !important;
+  font-size: 13px;
+  line-height: 1.7;
 }
 
 /*
@@ -664,8 +714,12 @@ async function goToProfile(): Promise<void> {
     font-size: 12px;
   }
 
-  .body-layout {
-    min-height: calc(100vh - 72px);
+  .site-footer {
+    padding: 16px 12px;
+  }
+
+  .portfolio-disclaimer {
+    font-size: 12px;
   }
 
   .site-main {

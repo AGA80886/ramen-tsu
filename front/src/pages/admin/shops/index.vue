@@ -2,17 +2,42 @@
   <section class="admin-shops-page">
     <header class="page-header">
       <div>
+        <p class="page-eyebrow">
+          SHOP MANAGEMENT
+        </p>
         <h1>店家管理</h1>
-        <p>管理拉麵店家資料、審核狀態與公開內容。</p>
+        <p class="page-description">
+          管理拉麵店家資料、審核狀態與公開內容。
+        </p>
       </div>
     </header>
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <span>全部店家</span>
+        <strong>{{ totalCount }}</strong>
+      </div>
+
+      <div class="overview-card">
+        <span>待審核</span>
+        <strong>{{ pendingCount }}</strong>
+      </div>
+
+      <div class="overview-card">
+        <span>已通過</span>
+        <strong>{{ approvedCount }}</strong>
+      </div>
+    </div>
 
     <AppLoading
       :loading="loading"
       text="正在載入店家..."
       min-height="360px"
     >
-      <AppCard v-if="error">
+      <AppCard
+        v-if="error"
+        class="management-card"
+      >
         <AppEmpty description="無法取得店家資料">
           <AppButton
             type="primary"
@@ -24,7 +49,10 @@
         </AppEmpty>
       </AppCard>
 
-      <AppCard v-else>
+      <AppCard
+        v-else
+        class="management-card"
+      >
         <div class="toolbar">
           <el-input
             v-model="search"
@@ -428,6 +456,16 @@ const selectedShop =
 const detailDialogVisible =
   ref(false)
 
+const totalCount = computed(() => adminShops.value.length)
+
+const pendingCount = computed(
+  () => adminShops.value.filter(shop => shop.status === 'pending').length,
+)
+
+const approvedCount = computed(
+  () => adminShops.value.filter(shop => shop.status === 'approved').length,
+)
+
 const cityOptions = computed(() => {
   return [
     ...new Set(
@@ -648,37 +686,78 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .admin-shops-page {
-  padding: 24px;
+  display: grid;
+  gap: 20px;
 }
 
 .page-header {
   display: flex;
-  gap: 20px;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 24px;
+  gap: 24px;
 
   h1 {
-    margin: 0;
-    font-size: 28px;
+    margin: 4px 0 6px;
+    font-size: 1.75rem;
+    line-height: 1.25;
+  }
+}
+
+.page-eyebrow {
+  margin: 0;
+  color: var(--el-color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.page-description {
+  margin: 0;
+  color: var(--el-text-color-secondary);
+  line-height: 1.6;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.overview-card {
+  display: flex;
+  min-height: 92px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 20px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  background: var(--el-bg-color);
+
+  span {
+    color: var(--el-text-color-secondary);
+    font-size: 0.875rem;
   }
 
-  p {
-    margin: 8px 0 0;
-    color: var(
-      --color-text-secondary
-    );
+  strong {
+    margin-top: 6px;
+    color: var(--el-text-color-primary);
+    font-size: 1.5rem;
   }
+}
+
+.management-card {
+  overflow: hidden;
 }
 
 .toolbar {
   display: grid;
-  grid-template-columns:
-    minmax(260px, 1fr)
-    180px
-    160px;
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: minmax(280px, 1fr) 180px 170px;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  background: var(--el-fill-color-extra-light);
 }
 
 .shop-table {
@@ -688,14 +767,14 @@ onMounted(async () => {
 .shop-cell {
   display: flex;
   min-width: 0;
-  gap: 12px;
   align-items: center;
+  gap: 12px;
 
   &__image,
   &__placeholder {
     width: 56px;
     height: 56px;
-    flex-shrink: 0;
+    flex: 0 0 56px;
     border-radius: 8px;
   }
 
@@ -706,11 +785,9 @@ onMounted(async () => {
   &__placeholder {
     display: grid;
     place-items: center;
-    background:
-      var(--el-fill-color-light);
-    color:
-      var(--color-text-secondary);
-    font-size: 12px;
+    background: var(--el-fill-color-light);
+    color: var(--el-text-color-secondary);
+    font-size: 0.75rem;
   }
 
   &__content {
@@ -720,15 +797,13 @@ onMounted(async () => {
     gap: 4px;
 
     strong {
-      color:
-        var(--color-heading);
+      color: var(--el-text-color-primary);
     }
 
     span,
     small {
       overflow: hidden;
-      color:
-        var(--color-text-secondary);
+      color: var(--el-text-color-secondary);
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -739,13 +814,18 @@ onMounted(async () => {
   }
 }
 
-.table-actions {
+.table-actions,
+.dialog-actions {
   display: flex;
   gap: 8px;
 
   :deep(.el-button) {
     margin-left: 0;
   }
+}
+
+.dialog-actions {
+  justify-content: flex-end;
 }
 
 .detail-panel {
@@ -761,19 +841,16 @@ onMounted(async () => {
 
 .detail-list {
   display: grid;
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 24px;
   margin: 0;
 
   > div {
     display: grid;
-    grid-template-columns:
-      100px minmax(0, 1fr);
+    grid-template-columns: 100px minmax(0, 1fr);
     gap: 12px;
     padding: 12px 0;
-    border-bottom: 1px solid
-      var(--color-border);
+    border-bottom: 1px solid var(--el-border-color-lighter);
   }
 
   &__full {
@@ -781,9 +858,8 @@ onMounted(async () => {
   }
 
   dt {
-    color:
-      var(--color-text-secondary);
-    font-size: 13px;
+    color: var(--el-text-color-secondary);
+    font-size: 0.8125rem;
     font-weight: 600;
   }
 
@@ -793,8 +869,7 @@ onMounted(async () => {
   }
 
   a {
-    color:
-      var(--el-color-primary);
+    color: var(--el-color-primary);
   }
 }
 
@@ -802,20 +877,13 @@ onMounted(async () => {
   white-space: pre-wrap;
 }
 
-.dialog-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-
-  :deep(.el-button) {
-    margin-left: 0;
-  }
-}
-
 @media (max-width: 900px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
   .toolbar {
-    grid-template-columns:
-      1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .toolbar > :first-child {
@@ -824,10 +892,6 @@ onMounted(async () => {
 }
 
 @media (max-width: 640px) {
-  .admin-shops-page {
-    padding: 16px;
-  }
-
   .page-header {
     flex-direction: column;
   }

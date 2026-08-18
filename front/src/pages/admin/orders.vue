@@ -2,17 +2,42 @@
   <section class="admin-orders-page">
     <header class="page-header">
       <div>
+        <p class="page-eyebrow">
+          ORDER MANAGEMENT
+        </p>
         <h1>訂單管理</h1>
-        <p>查看所有會員訂單並管理訂單狀態。</p>
+        <p class="page-description">
+          查看所有會員訂單並管理訂單狀態。
+        </p>
       </div>
     </header>
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <span>全部訂單</span>
+        <strong>{{ totalCount }}</strong>
+      </div>
+
+      <div class="overview-card">
+        <span>待處理</span>
+        <strong>{{ pendingCount }}</strong>
+      </div>
+
+      <div class="overview-card">
+        <span>已完成</span>
+        <strong>{{ completedCount }}</strong>
+      </div>
+    </div>
 
     <AppLoading
       :loading="isLoading"
       text="正在載入訂單..."
       min-height="360px"
     >
-      <AppCard v-if="error">
+      <AppCard
+        v-if="error"
+        class="management-card"
+      >
         <AppEmpty description="無法取得訂單資料">
           <AppButton
             type="primary"
@@ -24,7 +49,10 @@
         </AppEmpty>
       </AppCard>
 
-      <AppCard v-else>
+      <AppCard
+        v-else
+        class="management-card"
+      >
         <div class="toolbar">
           <el-input
             v-model="search"
@@ -56,7 +84,7 @@
           :data="filteredOrders"
           row-key="_id"
           stripe
-          style="width: 100%"
+          class="management-table"
         >
           <el-table-column type="expand">
             <template #default="{ row }">
@@ -344,6 +372,18 @@ const isUpdating = computed(() => {
   return updateOrderStatusMutation.isLoading.value
 })
 
+const orderList = computed(() => orders.value ?? [])
+
+const totalCount = computed(() => orderList.value.length)
+
+const pendingCount = computed(
+  () => orderList.value.filter(order => order.status === 'pending').length,
+)
+
+const completedCount = computed(
+  () => orderList.value.filter(order => order.status === 'completed').length,
+)
+
 const filteredOrders = computed(() => {
   const keyword =
     search.value.trim().toLowerCase()
@@ -545,30 +585,77 @@ async function reloadOrders(): Promise<void> {
 
 <style scoped lang="scss">
 .admin-orders-page {
-  padding: 24px;
+  display: grid;
+  gap: 20px;
 }
 
 .page-header {
-  margin-bottom: 24px;
-
   h1 {
-    margin: 0;
-    font-size: 28px;
+    margin: 4px 0 6px;
+    font-size: 1.75rem;
+    line-height: 1.25;
+  }
+}
+
+.page-eyebrow {
+  margin: 0;
+  color: var(--el-color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.page-description {
+  margin: 0;
+  color: var(--el-text-color-secondary);
+  line-height: 1.6;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.overview-card {
+  display: flex;
+  min-height: 92px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 20px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  background: var(--el-bg-color);
+
+  span {
+    color: var(--el-text-color-secondary);
+    font-size: 0.875rem;
   }
 
-  p {
-    margin: 8px 0 0;
-    color: var(--color-text-secondary);
+  strong {
+    margin-top: 6px;
+    color: var(--el-text-color-primary);
+    font-size: 1.5rem;
   }
+}
+
+.management-card {
+  overflow: hidden;
 }
 
 .toolbar {
   display: grid;
-  grid-template-columns:
-    minmax(280px, 1fr)
-    220px;
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: minmax(300px, 1fr) 220px;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  background: var(--el-fill-color-extra-light);
+}
+
+.management-table {
+  width: 100%;
 }
 
 .user-cell {
@@ -576,8 +663,12 @@ async function reloadOrders(): Promise<void> {
   flex-direction: column;
   gap: 4px;
 
+  strong {
+    color: var(--el-text-color-primary);
+  }
+
   span {
-    color: var(--color-text-secondary);
+    color: var(--el-text-color-secondary);
     font-size: 0.85rem;
   }
 }
@@ -590,15 +681,14 @@ async function reloadOrders(): Promise<void> {
 
     p {
       display: grid;
-      grid-template-columns:
-        120px minmax(0, 1fr);
+      grid-template-columns: 120px minmax(0, 1fr);
       gap: 16px;
       margin: 0;
       padding: 6px 0;
     }
 
     span {
-      color: var(--color-text-secondary);
+      color: var(--el-text-color-secondary);
     }
 
     strong {
@@ -609,18 +699,18 @@ async function reloadOrders(): Promise<void> {
 
 .order-item {
   display: grid;
-  grid-template-columns:
-    80px minmax(180px, 1fr)
-    100px 120px;
+  grid-template-columns: 80px minmax(180px, 1fr) 100px 120px;
+  align-items: center;
   gap: 16px;
   padding: 14px 0;
-  align-items: center;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--el-border-color-lighter);
 
   &__image {
     width: 80px;
     height: 68px;
-    border-radius: var(--radius-md);
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--el-fill-color-light);
   }
 
   &__image-error {
@@ -628,7 +718,7 @@ async function reloadOrders(): Promise<void> {
     width: 100%;
     height: 100%;
     place-items: center;
-    color: var(--color-text-secondary);
+    color: var(--el-text-color-secondary);
     font-size: 0.75rem;
   }
 
@@ -638,7 +728,7 @@ async function reloadOrders(): Promise<void> {
     gap: 4px;
 
     span {
-      color: var(--color-text-secondary);
+      color: var(--el-text-color-secondary);
     }
   }
 
@@ -649,19 +739,18 @@ async function reloadOrders(): Promise<void> {
 }
 
 @media (max-width: 900px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
   .toolbar {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 720px) {
-  .admin-orders-page {
-    padding: 16px;
-  }
-
   .order-item {
-    grid-template-columns:
-      64px minmax(0, 1fr);
+    grid-template-columns: 64px minmax(0, 1fr);
 
     &__image {
       width: 64px;

@@ -56,13 +56,18 @@
 import validator from 'validator'
 import { Lock, User } from '@element-plus/icons-vue'
 import { useForm } from 'vee-validate'
-import { RouterLink, useRouter } from 'vue-router'
+import {
+  RouterLink,
+  useRoute,
+  useRouter,
+} from 'vue-router'
 import * as yup from 'yup'
 import { useLoginMutation } from '@/queries/auth'
 import { useSnackbarStore } from '@/stores/snackbar'
 
 const { mutateAsync: login } = useLoginMutation()
 const router = useRouter()
+const route = useRoute()
 const snackbar = useSnackbarStore()
 const schema = yup.object({
   account: yup.string().required('帳號必填').min(4, '帳號必需是 4 個字以上').max(20, '帳號必需是 20 個字以下').test('isAlphanumeric', '帳號只能是英數字', value => validator.isAlphanumeric(value || '')),
@@ -74,9 +79,27 @@ const [password] = defineField('password')
 const submit = handleSubmit(async values => {
   try {
     await login(values)
-    snackbar.add({ text: '登入成功', color: 'success' })
-    await router.push('/')
-  } catch (error) { snackbar.addError(error) }
+
+    snackbar.add({
+      text: '登入成功',
+      color: 'success',
+    })
+
+    const redirectQuery =
+      typeof route.query.redirect === 'string'
+        ? route.query.redirect
+        : '/'
+
+    const redirect =
+      redirectQuery.startsWith('/')
+      && !redirectQuery.startsWith('//')
+        ? redirectQuery
+        : '/'
+
+    await router.push(redirect)
+  } catch (error) {
+    snackbar.addError(error)
+  }
 })
 </script>
 

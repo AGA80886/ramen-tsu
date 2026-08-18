@@ -5,7 +5,7 @@ import validator from 'validator'
 import { StatusCodes } from 'http-status-codes'
 import { Types } from 'mongoose'
 import User, { type UserDocument } from '../models/user'
-import Product from '../models/product'
+import Product from '../models/products'
 import cloudinary from '../configs/cloudinary'
 import EmailVerificationToken from '../models/emailVerificationToken'
 import { createRandomToken, hashToken } from '../utils/token'
@@ -118,28 +118,40 @@ export const cart = async (req: Request, res: Response) => {
       .required('商品必填')
       .trim()
       .test('isMongoId', '資料格式錯誤', (value) => validator.isMongoId(value)),
-    quantity: yup.number().typeError('資料格式錯誤').required('數量必填'),
+    quantity: yup.number().typeError('資料格式錯誤').required('數量必填').integer('數量必須為整數'),
     replace: yup.boolean().typeError('資料格式錯誤').required('取代必填'),
   })
   const parsedBody = await schema.validate(req.body, { stripUnknown: true })
 
-  await Product.findById(parsedBody.product).orFail(new Error('PRODUCT NOT FOUND'))
+  const product = await Product.findById(parsedBody.product).orFail(new Error('PRODUCT NOT FOUND'))
 
-  const idx = req.user!.cart.findIndex((item) => {
-    return item.product.toString() === parsedBody.product
-  })
+  const idx = req.user!.cart.findIndex((item) => item.product.toString() === parsedBody.product)
 
   if (idx > -1) {
-    if (parsedBody.replace) {
-      req.user!.cart[idx]!.quantity = parsedBody.quantity
-    } else {
-      req.user!.cart[idx]!.quantity += parsedBody.quantity
-    }
+    const currentQuantity = req.user!.cart[idx]!.quantity
 
-    if (req.user!.cart[idx]!.quantity <= 0) {
+    const nextQuantity = parsedBody.replace
+      ? parsedBody.quantity
+      : currentQuantity + parsedBody.quantity
+
+    if (nextQuantity <= 0) {
       req.user!.cart.splice(idx, 1)
+    } else {
+      const isIncreasing = parsedBody.replace
+        ? nextQuantity > currentQuantity
+        : parsedBody.quantity > 0
+
+      if (isIncreasing && !product.sell) {
+        throw new Error('CART SELL')
+      }
+
+      req.user!.cart[idx]!.quantity = nextQuantity
     }
   } else if (parsedBody.quantity > 0) {
+    if (!product.sell) {
+      throw new Error('CART SELL')
+    }
+
     req.user!.cart.push({
       product: new Types.ObjectId(parsedBody.product),
       quantity: parsedBody.quantity,

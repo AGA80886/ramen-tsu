@@ -35,7 +35,7 @@
         </AppCard>
 
         <AppCard
-          v-else-if="validCartItems.length === 0"
+          v-else-if="existingCartItems.length === 0"
           class="cart-state"
         >
           <el-alert
@@ -44,9 +44,27 @@
             type="warning"
             :closable="false"
             show-icon
-            title="購物車內有已不存在的商品"
-            description="失效商品不會列入金額計算，請重新整理或聯絡管理員協助處理。"
-          />
+          >
+            <template #title>
+              購物車內有商品目前無法購買
+            </template>
+
+            <template #default>
+              <div class="invalid-cart-alert__details">
+                <p v-if="missingItemCount > 0">
+                  {{ missingItemCount }} 項商品已不存在。
+                </p>
+
+                <p v-if="unavailableItemCount > 0">
+                  {{ unavailableItemCount }} 項商品已下架。
+                </p>
+
+                <p>
+                  請先移除失效商品，再進入結帳。
+                </p>
+              </div>
+            </template>
+          </el-alert>
 
           <AppEmpty description="購物車目前沒有可購買的商品">
             <AppButton @click="goOnlineStore">
@@ -62,9 +80,27 @@
             type="warning"
             :closable="false"
             show-icon
-            :title="`購物車內有 ${invalidItemCount} 項商品已不存在`"
-            description="失效商品不會列入金額計算，也不能進入結帳流程。"
-          />
+          >
+            <template #title>
+              購物車內有商品目前無法購買
+            </template>
+
+            <template #default>
+              <div class="invalid-cart-alert__details">
+                <p v-if="missingItemCount > 0">
+                  {{ missingItemCount }} 項商品已不存在。
+                </p>
+
+                <p v-if="unavailableItemCount > 0">
+                  {{ unavailableItemCount }} 項商品已下架。
+                </p>
+
+                <p>
+                  失效商品不會列入金額計算，請先移除後再進入結帳。
+                </p>
+              </div>
+            </template>
+          </el-alert>
 
           <div class="cart-layout">
             <AppCard
@@ -72,11 +108,15 @@
               title="商品清單"
             >
               <div
-                v-for="item in validCartItems"
+                v-for="item in existingCartItems"
                 :key="item._id"
+                :class="{
+                  'cart-item--unavailable': !item.product.sell,
+                }"
                 class="cart-item"
               >
                 <RouterLink
+                  v-if="item.product.sell"
                   class="cart-item__image-link"
                   :to="`/product/${item.product._id}`"
                 >
@@ -93,17 +133,51 @@
                   </el-image>
                 </RouterLink>
 
+                <div
+                  v-else
+                  class="cart-item__image-link"
+                >
+                  <el-image
+                    class="cart-item__image"
+                    fit="cover"
+                    :src="item.product.imageUrl || item.product.image"
+                  >
+                    <template #error>
+                      <div class="cart-item__image-error">
+                        圖片載入失敗
+                      </div>
+                    </template>
+                  </el-image>
+                </div>
+
                 <div class="cart-item__content">
                   <RouterLink
+                    v-if="item.product.sell"
                     class="cart-item__name"
                     :to="`/product/${item.product._id}`"
                   >
                     {{ item.product.name }}
                   </RouterLink>
 
+                  <span
+                    v-else
+                    class="cart-item__name cart-item__name--disabled"
+                  >
+                    {{ item.product.name }}
+                  </span>
+
                   <p class="cart-item__category">
                     {{ item.product.category }}
                   </p>
+
+                  <el-tag
+                    v-if="!item.product.sell"
+                    class="cart-item__status"
+                    type="danger"
+                    effect="light"
+                  >
+                    已下架
+                  </el-tag>
 
                   <p class="cart-item__price">
                     單價：{{ formatCurrency(item.product.price) }}
@@ -117,12 +191,16 @@
                     :model-value="item.quantity"
                     :min="1"
                     :max="99"
-                    :disabled="isMutatingCart"
+                    :disabled="
+                      isMutatingCart
+                        || !item.product.sell
+                    "
                     @change="
                       updateQuantity(
                         item.product._id,
                         $event,
                         item.quantity,
+                        item.product.sell,
                       )
                     "
                   />
@@ -163,7 +241,7 @@
                 <dl class="summary-list">
                   <div>
                     <dt>商品種類</dt>
-                    <dd>{{ validCartItems.length }}</dd>
+                    <dd>{{ purchasableCartItems.length }}</dd>
                   </div>
 
                   <div>
@@ -192,7 +270,7 @@
                     :disabled="
                       isMutatingCart ||
                         invalidItemCount > 0 ||
-                        validCartItems.length === 0
+                        purchasableCartItems.length === 0
                     "
                     @click="goToCheckout"
                   >
@@ -218,7 +296,11 @@
 <script setup lang="ts">
 import type { ICartItem } from '@/types/cart'
 
-import { computed, ref } from 'vue'
+import {
+  computed,
+  onMounted,
+  ref,
+} from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 
@@ -247,28 +329,51 @@ const addCartItemMutation = useAddCartItemMutation()
 const isReloading = ref(false)
 const pendingProductId = ref('')
 
-const validCartItems = computed<ValidCartItem[]>(() => {
+onMounted(async () => {
+  await refetch()
+})
+
+const existingCartItems = computed<ValidCartItem[]>(() => {
   return (cartItems.value ?? []).filter(
     (item): item is ValidCartItem =>
       item.product !== null,
   )
 })
 
-const invalidItemCount = computed(() => {
+const purchasableCartItems = computed<ValidCartItem[]>(() => {
+  return existingCartItems.value.filter(
+    item => item.product.sell,
+  )
+})
+
+const missingItemCount = computed(() => {
   return (cartItems.value ?? []).filter(
     item => item.product === null,
   ).length
 })
 
+const unavailableItemCount = computed(() => {
+  return existingCartItems.value.filter(
+    item => !item.product.sell,
+  ).length
+})
+
+const invalidItemCount = computed(() => {
+  return (
+    missingItemCount.value
+    + unavailableItemCount.value
+  )
+})
+
 const totalQuantity = computed(() => {
-  return validCartItems.value.reduce(
+  return purchasableCartItems.value.reduce(
     (total, item) => total + item.quantity,
     0,
   )
 })
 
 const totalPrice = computed(() => {
-  return validCartItems.value.reduce(
+  return purchasableCartItems.value.reduce(
     (total, item) =>
       total + item.product.price * item.quantity,
     0,
@@ -305,7 +410,16 @@ async function updateQuantity(
   productId: string,
   value: number | undefined,
   currentQuantity: number,
+  sell: boolean,
 ): Promise<void> {
+  if (!sell) {
+    snackbar.add({
+      text: '此商品已下架，請將商品移出購物車',
+      color: 'warning',
+    })
+    return
+  }
+
   const quantity = Number(value)
 
   if (
@@ -387,7 +501,7 @@ async function goToCheckout(): Promise<void> {
   if (
     isMutatingCart.value ||
     invalidItemCount.value > 0 ||
-    validCartItems.value.length === 0
+    purchasableCartItems.value.length === 0
   ) {
     return
   }
@@ -519,6 +633,17 @@ async function goToCheckout(): Promise<void> {
 
     &:hover {
       color: var(--bs-primary);
+    }
+
+    &--disabled {
+      color: var(--color-text-secondary);
+      cursor: default;
+      text-decoration: line-through;
+
+      &:hover {
+        color: var(--color-text-secondary);
+        text-decoration: line-through;
+      }
     }
   }
 
@@ -684,6 +809,25 @@ async function goToCheckout(): Promise<void> {
       justify-content: space-between;
       text-align: left;
     }
+  }
+}
+
+.cart-item {
+  &--unavailable {
+    opacity: 0.72;
+  }
+
+  &__status {
+    margin-top: 8px;
+  }
+}
+
+.invalid-cart-alert__details {
+  display: grid;
+  gap: 4px;
+
+  p {
+    margin: 0;
   }
 }
 </style>

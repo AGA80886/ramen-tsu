@@ -1,4 +1,12 @@
-export type TCategoryOptions = '3C' | '食品' | '衣服'
+export const productCategoryOptions = [
+  '泡麵／即食麵',
+  '拉麵食材',
+  '餐具',
+  '周邊商品',
+  '其他',
+] as const
+
+export type TCategoryOptions = (typeof productCategoryOptions)[number]
 
 export interface IProduct {
   _id: string

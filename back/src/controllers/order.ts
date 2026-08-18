@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 
 import Order, { type IOrderItem } from '../models/order'
-import Product from '../models/product'
+import Product from '../models/products'
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   const cart = req.user!.cart

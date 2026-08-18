@@ -59,9 +59,23 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/admin/product': RouteRecordInfo<
-      '/admin/product',
-      '/admin/product',
+    '/admin/products/': RouteRecordInfo<
+      '/admin/products/',
+      '/admin/products',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/products/[id]/edit': RouteRecordInfo<
+      '/admin/products/[id]/edit',
+      '/admin/products/:id/edit',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/admin/products/create': RouteRecordInfo<
+      '/admin/products/create',
+      '/admin/products/create',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -143,9 +157,9 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/product/[id]': RouteRecordInfo<
-      '/product/[id]',
-      '/product/:id',
+    '/products/[id]': RouteRecordInfo<
+      '/products/[id]',
+      '/products/:id',
       { id: ParamValue<true> },
       { id: ParamValue<false> },
       | never
@@ -307,9 +321,25 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/admin/product.vue': {
+    'src/pages/admin/products/index.vue': {
       routes:
-        | '/admin/product'
+        | '/admin/products/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/products/[id]/edit.vue': {
+      routes:
+        | '/admin/products/[id]/edit'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/products/create.vue': {
+      routes:
+        | '/admin/products/create'
       views:
         | never
       pathParamNames:
@@ -403,9 +433,9 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/product/[id].vue': {
+    'src/pages/products/[id].vue': {
       routes:
-        | '/product/[id]'
+        | '/products/[id]'
       views:
         | never
       pathParamNames:

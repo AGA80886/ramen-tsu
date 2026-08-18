@@ -1,7 +1,7 @@
 import type { AxiosResponse } from 'axios'
 
 import type { ApiResponse } from '@/types/api'
-import type { IProduct, ProductForm } from '@/types/product'
+import type { IProduct, ProductForm } from '@/types/products'
 
 import { api, apiAuth } from './api'
 
@@ -51,4 +51,10 @@ export function getProductById(
   id: string,
 ): Promise<AxiosResponse<ApiResponse<IProduct>>> {
   return api.get(`/product/${id}`)
-} 
+}
+
+export function getAdminProductById(
+  id: string,
+): Promise<AxiosResponse<ApiResponse<IProduct>>> {
+  return apiAuth.get(`/product/admin/${id}`)
+}
