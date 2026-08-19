@@ -913,6 +913,73 @@ onMounted(async () => {
     }
   }
 }
+
+/* Step 6-5.6 RWD final regression */
+.admin-shops-page {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .management-card :deep(.el-card__body) {
+    overflow-x: auto;
+  }
+
+  .shop-table {
+    min-width: 920px;
+  }
+
+  .detail-list {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-list > div,
+  .detail-list__full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar > :first-child {
+    grid-column: auto;
+  }
+
+  .table-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-card {
+    min-height: 78px;
+    padding: 14px 16px;
+  }
+
+  .toolbar {
+    padding: 14px;
+  }
+
+  .detail-list > div {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+}
+
 </style>
 
 <route lang="yaml">

@@ -42,7 +42,7 @@ export const useAddCartItemMutation =
         user.cart =
           response.data.result
 
-        // 只更新目前會員自己的購物車
+        // 讓目前會員的購物車 Query 立即失效並重新取得最新資料
         await queryCache
           .invalidateQueries({
             key:
@@ -54,17 +54,32 @@ export const useAddCartItemMutation =
     })
   })
 
-export const useCartItemsQuery = defineQuery(() => {
-  return useQuery({
-    key: ['cart'],
+export const useCartItemsQuery =
+  defineQuery(() => {
+    const user =
+      useUserStore()
 
-    query: async () => {
-      const { data } =
-        await cartService.getCartItems()
+    return useQuery({
+      key: () =>
+        cartKeys.mine(
+          user.account,
+        ),
 
-      return data.result
-    },
+      query: async () => {
+        const { data } =
+          await cartService
+            .getCartItems()
 
-    staleTime: 0,
+        return data.result
+      },
+
+      enabled: () =>
+        user.isLoggedIn
+        && Boolean(
+          user.account,
+        ),
+
+      // 購物車屬於高頻變動資料，不保留 stale cache
+      staleTime: 0,
+    })
   })
-})

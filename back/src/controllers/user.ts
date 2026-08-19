@@ -24,6 +24,41 @@ const toProfileResponse = (user: UserDocument) => ({
   updatedAt: user.updatedAt,
 })
 
+const toAdminUserResponse = (user: UserDocument) => ({
+  _id: user._id.toString(),
+  account: user.account,
+  email: user.email ?? '',
+  emailVerified: user.emailVerified ?? false,
+  emailVerifiedAt: user.emailVerifiedAt ?? null,
+  nickname: user.nickname ?? '',
+  avatar: user.avatar ?? '',
+  role: user.role,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+})
+
+export const getAdminUserById = async (req: Request, res: Response): Promise<void> => {
+  const user = await User.findById(req.params.id).orFail(new Error('USER_NOT_FOUND'))
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '',
+    result: toAdminUserResponse(user),
+  })
+}
+
+export const getAll = async (_req: Request, res: Response): Promise<void> => {
+  const users = await User.find().sort({
+    createdAt: -1,
+  })
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '',
+    result: users.map(toAdminUserResponse),
+  })
+}
+
 export const getMe = async (req: Request, res: Response) => {
   const user = await User.findById(req.user!._id).orFail(new Error('USER_NOT_FOUND'))
 
@@ -191,6 +226,32 @@ const updatePasswordSchema = yup.object({
       return value !== this.parent.currentPassword
     }),
 })
+
+const updateAdminUserRoleSchema = yup.object({
+  role: yup
+    .mixed<'user' | 'admin'>()
+    .oneOf(['user', 'admin'], '會員角色錯誤')
+    .required('會員角色必填'),
+})
+
+export const updateAdminUserRole = async (req: Request, res: Response): Promise<void> => {
+  const body = await updateAdminUserRoleSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  })
+
+  const user = await User.findById(req.params.id).orFail(new Error('USER_NOT_FOUND'))
+
+  user.role = body.role
+
+  await user.save()
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '會員角色更新成功',
+    result: toAdminUserResponse(user),
+  })
+}
 
 export const updatePassword = async (req: Request, res: Response): Promise<void> => {
   const body = await updatePasswordSchema.validate(req.body, {

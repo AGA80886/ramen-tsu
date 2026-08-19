@@ -9,17 +9,10 @@
       <div class="admin-brand">
         <img
           :src="logo"
-          alt="Ramen-Tsu-Logo"
+          alt="拉麵通 Logo"
           class="brand-logo"
+          :class="{ 'brand-logo--collapsed': isCollapsed }"
         />
-
-        <div
-          v-show="!isCollapsed"
-          class="brand-copy"
-        >
-          <strong>拉麵通</strong>
-          <span>ADMIN</span>
-        </div>
       </div>
 
       <AdminMenu
@@ -40,14 +33,9 @@
       <div class="mobile-drawer__brand">
         <img
           :src="logo"
-          alt="Ramen-Tsu-Logo"
-          class="brand-logo"
+          alt="拉麵通 Logo"
+          class="brand-logo brand-logo--mobile"
         />
-
-        <div class="brand-copy">
-          <strong>拉麵通</strong>
-          <span>ADMIN</span>
-        </div>
       </div>
 
       <AdminMenu
@@ -170,7 +158,7 @@ import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref } from 'v
 import { ElIcon, ElMenu, ElMenuItem, ElSubMenu } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 
-import logo from '@/assets/images/logo.png'
+import logo from '@/assets/images/ramen-tsu-logo.png'
 import DarkModeToggle from '@/components/common/DarkModeToggle.vue'
 import { useLogoutMutation } from '@/queries/auth'
 import { useSnackbarStore } from '@/stores/snackbar'
@@ -423,41 +411,31 @@ onBeforeUnmount(() => {
 .mobile-drawer__brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   height: 72px;
-  padding: 0 14px;
+  padding: 0 10px;
+  overflow: hidden;
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
-.admin-brand {
-  justify-content: center;
-}
-
 .brand-logo {
-  width: 44px;
-  height: 44px;
-  flex: 0 0 44px;
+  display: block;
+  width: 205px;
+  max-width: 100%;
+  height: 58px;
   object-fit: contain;
+  object-position: center;
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
-.brand-copy {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 2px;
+.brand-logo--collapsed {
+  width: 58px;
+  height: 58px;
+}
 
-  strong {
-    color: var(--el-text-color-primary);
-    font-size: 1rem;
-    white-space: nowrap;
-  }
-
-  span {
-    color: var(--el-text-color-secondary);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-  }
+.brand-logo--mobile {
+  width: 220px;
+  height: 58px;
 }
 
 :deep(.admin-menu) {

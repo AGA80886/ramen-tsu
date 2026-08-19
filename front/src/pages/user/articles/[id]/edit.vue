@@ -68,7 +68,7 @@
 
           <el-alert
             v-else-if="article.status === 'rejected'"
-            title="此文章尚未通過審核，你可以修改內容後重新送審。"
+            title="此文章尚未通過審核，您可以修改內容後重新送審。"
             type="info"
             :closable="false"
             show-icon

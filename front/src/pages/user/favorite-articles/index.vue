@@ -10,7 +10,7 @@
           <h1>我的收藏文章</h1>
 
           <p class="favorite-articles-hero__description">
-            查看你收藏的拉麵論壇文章，快速回到想再次閱讀的內容。
+            查看您收藏的拉麵論壇文章，快速回到想再次閱讀的內容。
           </p>
         </div>
       </div>

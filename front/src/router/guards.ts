@@ -33,16 +33,21 @@ export function setupRouterGuards(router: Router): void {
      *
      * Router Guard 不屬於元件 setup 或 effect scope，
      * 因此不在這裡呼叫 Pinia Colada mutation composable。
-     * → 只負責初次恢復登入狀態(by ChatGPT)
      */
-    if (from === START_LOCATION && !isAuthInitialized) {
+    if (
+      from === START_LOCATION
+      && !isAuthInitialized
+    ) {
       isAuthInitialized = true
 
       try {
-        const response = await authService.refresh()
+        const response =
+          await authService.refresh()
 
         if (response.data?.result) {
-          user.login(response.data.result)
+          user.login(
+            response.data.result,
+          )
         }
       } catch {
         // 沒有有效登入狀態時，不阻止導航。
@@ -55,21 +60,29 @@ export function setupRouterGuards(router: Router): void {
      *
      * 已登入使用者不可再次進入登入、註冊等頁面。
      */
-    if (to.meta.access === 'guest' && user.isLoggedIn) {
+    if (
+      to.meta.access === 'guest'
+      && user.isLoggedIn
+    ) {
       return {
         path: '/',
       }
     }
 
     /**
-     * authenticated 頁面或設定 roles 的頁面，
+     * authenticated 頁面或有設定 roles 的頁面，
      * 都必須先登入。
      */
     const requiresAuthentication =
-      to.meta.access === 'authenticated' ||
-      Boolean(to.meta.roles?.length)
+      to.meta.access === 'authenticated'
+      || Boolean(
+        to.meta.roles?.length,
+      )
 
-    if (requiresAuthentication && !user.isLoggedIn) {
+    if (
+      requiresAuthentication
+      && !user.isLoggedIn
+    ) {
       return {
         path: '/login',
         query: {
@@ -78,42 +91,31 @@ export function setupRouterGuards(router: Router): void {
       }
     }
 
-    if (requiresAuthentication && !user.isLoggedIn) {
-  return {
-    path: '/login',
-    query: {
-      redirect: to.fullPath,
-    },
-  }
-}
-
-const isAdminRoute =
-  to.path === '/admin' ||
-  to.path.startsWith('/admin/')
-
-if (
-  isAdminRoute &&
-  user.isLoggedIn &&
-  user.role !== 'admin'
-) {
-  return {
-    path: '/',
-    query: {
-      notice: 'admin-only',
-    },
-  }
-}
-
-if (!hasRequiredRole(to.meta.roles, user.role)) {
-  return {
-    path: '/',
-    query: {
-      notice: 'admin-only',
-    },
-  }
-}
-
-return true
+    /**
+     * Role Guard
+     *
+     * 例如：
+     *
+     * meta:
+     *   roles:
+     *     - admin
+     *
+     * 一般會員無法進入該頁面。
+     */
+    if (
+      user.isLoggedIn
+      && !hasRequiredRole(
+        to.meta.roles,
+        user.role,
+      )
+    ) {
+      return {
+        path: '/',
+        query: {
+          notice: 'admin-only',
+        },
+      }
+    }
 
     return true
   })

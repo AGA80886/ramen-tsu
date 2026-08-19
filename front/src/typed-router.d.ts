@@ -45,15 +45,15 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/admin/articles': RouteRecordInfo<
-      '/admin/articles',
+    '/admin/articles/': RouteRecordInfo<
+      '/admin/articles/',
       '/admin/articles',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/admin/orders': RouteRecordInfo<
-      '/admin/orders',
+    '/admin/orders/': RouteRecordInfo<
+      '/admin/orders/',
       '/admin/orders',
       Record<never, never>,
       Record<never, never>,
@@ -85,6 +85,20 @@ declare module 'vue-router/auto-routes' {
       '/admin/shops',
       Record<never, never>,
       Record<never, never>,
+      | never
+    >,
+    '/admin/users/': RouteRecordInfo<
+      '/admin/users/',
+      '/admin/users',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/users/[id]': RouteRecordInfo<
+      '/admin/users/[id]',
+      '/admin/users/:id',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
       | never
     >,
     '/articles/': RouteRecordInfo<
@@ -220,8 +234,8 @@ declare module 'vue-router/auto-routes' {
       { id: ParamValue<false> },
       | never
     >,
-    '/user/cart': RouteRecordInfo<
-      '/user/cart',
+    '/user/cart/': RouteRecordInfo<
+      '/user/cart/',
       '/user/cart',
       Record<never, never>,
       Record<never, never>,
@@ -305,17 +319,17 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/admin/articles.vue': {
+    'src/pages/admin/articles/index.vue': {
       routes:
-        | '/admin/articles'
+        | '/admin/articles/'
       views:
         | never
       pathParamNames:
         | never
     }
-    'src/pages/admin/orders.vue': {
+    'src/pages/admin/orders/index.vue': {
       routes:
-        | '/admin/orders'
+        | '/admin/orders/'
       views:
         | never
       pathParamNames:
@@ -352,6 +366,22 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | never
+    }
+    'src/pages/admin/users/index.vue': {
+      routes:
+        | '/admin/users/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/users/[id].vue': {
+      routes:
+        | '/admin/users/[id]'
+      views:
+        | never
+      pathParamNames:
+        | 'id'
     }
     'src/pages/articles/index.vue': {
       routes:
@@ -505,9 +535,9 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/user/cart.vue': {
+    'src/pages/user/cart/index.vue': {
       routes:
-        | '/user/cart'
+        | '/user/cart/'
       views:
         | never
       pathParamNames:

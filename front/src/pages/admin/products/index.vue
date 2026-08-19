@@ -562,6 +562,68 @@ function formatDate(value: string) {
     width: 100%;
   }
 }
+
+/* Step 6-5.6 RWD final regression */
+.admin-product-page {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-panel {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) repeat(2, 180px);
+  }
+
+  .filter-control,
+  .filter-search {
+    width: 100%;
+  }
+
+  .table-panel {
+    overflow-x: auto;
+  }
+
+  .product-table {
+    min-width: 820px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header .create-link,
+  .page-header .create-link :deep(.el-button) {
+    width: 100%;
+  }
+
+  .filter-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-card {
+    min-height: 78px;
+    padding: 14px 16px;
+  }
+
+  .filter-panel {
+    padding: 14px;
+  }
+}
+
 </style>
 
 <route lang="yaml">

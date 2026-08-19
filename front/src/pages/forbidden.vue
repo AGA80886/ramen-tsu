@@ -1,7 +1,7 @@
 <template>
   <main class="error-page">
     <el-result
-      sub-title="你的帳號沒有瀏覽此頁面的權限。"
+      sub-title="您的帳號沒有瀏覽此頁面的權限。"
       title="403 權限不足"
     >
       <template #extra>

@@ -2,7 +2,7 @@
   <div class="auth-page">
     <el-card class="auth-card">
       <template #header>
-        <h1>註冊</h1>
+        <h1>註冊會員</h1>
       </template>
       <el-form
         label-position="top"

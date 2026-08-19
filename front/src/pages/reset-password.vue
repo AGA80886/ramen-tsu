@@ -14,7 +14,7 @@
         v-else-if="status === 'success'"
         icon="success"
         title="密碼重設成功"
-        sub-title="你現在可以使用新密碼登入。"
+        sub-title="您現在可以使用新密碼登入。"
       >
         <template #extra>
           <AppButton

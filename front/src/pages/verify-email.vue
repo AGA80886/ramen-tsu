@@ -9,7 +9,7 @@
           <el-result
             icon="success"
             title="Email 驗證成功"
-            sub-title="你的 Email 已完成驗證。"
+            sub-title="您的 Email 已完成驗證。"
           >
             <template #extra>
               <AppButton
