@@ -210,7 +210,7 @@
                   maxlength="1000"
                   show-word-limit
                   resize="vertical"
-                  placeholder="分享你對這篇文章的想法..."
+                  placeholder="分享您對這篇文章的想法..."
                   @keydown.ctrl.enter="
                     submitComment
                   "

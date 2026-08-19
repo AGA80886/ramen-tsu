@@ -701,6 +701,62 @@ const submit = handleSubmit(async values => {
     flex-direction: column;
   }
 }
+
+/* Step 6-5.6 RWD final regression */
+.admin-product-edit-page {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-sidebar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header :deep(.app-button) {
+    width: 100%;
+  }
+
+  .field-grid,
+  .form-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .current-image {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-form-card :deep(.el-card__body),
+  .state-card :deep(.el-card__body) {
+    padding: 16px;
+  }
+
+  .form-main {
+    gap: 22px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions :deep(.app-button) {
+    width: 100%;
+  }
+}
+
 </style>
 
 <route lang="yaml">

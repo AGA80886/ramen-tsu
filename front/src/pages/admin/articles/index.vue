@@ -1025,6 +1025,60 @@ function articleStatusType(
     grid-column: auto;
   }
 }
+
+/* Step 6-5.6 RWD final regression */
+.admin-articles-page {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .management-card :deep(.el-card__body) {
+    overflow-x: auto;
+  }
+
+  .management-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar > :first-child {
+    grid-column: auto;
+  }
+
+  .table-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-card {
+    min-height: 78px;
+    padding: 14px 16px;
+  }
+
+  .toolbar {
+    padding: 14px;
+  }
+}
+
 </style>
 
 <route lang="yaml">

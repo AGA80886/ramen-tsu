@@ -19,7 +19,7 @@
         <el-result
           icon="success"
           title="訂單建立成功"
-          sub-title="你的訂單已成立，可以前往我的訂單查看。"
+          sub-title="您的訂單已成立，可以前往我的訂單查看。"
         >
           <template #extra>
             <div class="result-summary">

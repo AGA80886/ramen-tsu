@@ -13,11 +13,6 @@
             alt="拉麵通 Logo"
             class="brand-logo"
           />
-
-          <div class="brand-text">
-            <h1>拉麵通</h1>
-            <span>ラーメン通</span>
-          </div>
         </router-link>
 
         <!-- 右側：桌面版會員功能 -->
@@ -329,7 +324,7 @@ import { useLogoutMutation } from '@/queries/auth'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useUserStore } from '@/stores/user'
 
-import logo from '@/assets/images/logo.png'
+import logo from '@/assets/images/ramen-tsu-logo.png'
 
 const user = useUserStore()
 const route = useRoute()
@@ -400,7 +395,7 @@ async function goToProfile(): Promise<void> {
   position: sticky;
   z-index: 100;
   top: 0;
-  height: 100px;
+  height: 104px;
   padding: 0;
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
@@ -420,34 +415,19 @@ async function goToProfile(): Promise<void> {
 .brand {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-  gap: 16px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 320px;
   color: inherit;
   text-decoration: none;
 }
 
 .brand-logo {
-  width: 88px;
+  display: block;
+  width: clamp(240px, 18vw, 320px);
   height: 88px;
   object-fit: contain;
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.brand-text h1 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.brand-text span {
-  margin-top: 4px;
-  color: var(--color-text-secondary);
-  font-size: 14px;
+  object-position: left center;
 }
 
 .header-actions {
@@ -656,7 +636,7 @@ async function goToProfile(): Promise<void> {
 
 /* 平板與手機 */
 
-@media (max-width: 1400px) {
+@media (max-width: 1540px) {
   .desktop-actions {
     display: none;
   }
@@ -664,16 +644,43 @@ async function goToProfile(): Promise<void> {
   .mobile-actions {
     display: flex;
   }
+
+  .brand-logo {
+    width: clamp(230px, 22vw, 290px);
+  }
 }
 
-@media (min-width: 1401px) and (max-width: 1600px) {
+@media (min-width: 1541px) and (max-width: 1750px) {
+  .brand-logo {
+    width: clamp(230px, 17vw, 280px);
+  }
+
   .account-menu :deep(.el-menu-item) {
-    padding: 0 8px;
+    padding: 0 7px;
   }
 
   .member-info {
-    max-width: 120px;
-    padding: 0 8px;
+    max-width: 110px;
+    padding: 0 7px;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    height: 88px;
+  }
+
+  .header-inner {
+    padding: 0 16px;
+  }
+
+  .brand {
+    max-width: calc(100% - 96px);
+  }
+
+  .brand-logo {
+    width: min(260px, 58vw);
+    height: 72px;
   }
 }
 
@@ -690,28 +697,21 @@ async function goToProfile(): Promise<void> {
 
 @media (max-width: 480px) {
   .site-header {
-    height: 72px;
+    height: 76px;
   }
 
   .header-inner {
-    padding: 0 12px;
+    gap: 8px;
+    padding: 0 10px;
   }
 
   .brand {
-    gap: 10px;
+    max-width: calc(100% - 88px);
   }
 
   .brand-logo {
-    width: 56px;
-    height: 56px;
-  }
-
-  .brand-text h1 {
-    font-size: 21px;
-  }
-
-  .brand-text span {
-    font-size: 12px;
+    width: min(220px, 54vw);
+    height: 62px;
   }
 
   .site-footer {

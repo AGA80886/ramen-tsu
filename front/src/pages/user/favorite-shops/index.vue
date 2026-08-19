@@ -10,7 +10,7 @@
           <h1>我的收藏店家</h1>
 
           <p class="favorite-shops-hero__description">
-            查看你收藏的拉麵店家，快速回到想再次造訪的店家頁面。
+            查看您收藏的拉麵店家，快速回到想再次造訪的店家頁面。
           </p>
         </div>
       </div>
