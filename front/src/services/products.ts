@@ -37,6 +37,12 @@ export function updateProduct(
   )
 }
 
+export function deleteProduct(
+  id: string,
+): Promise<AxiosResponse<ApiResponse<null>>> {
+  return apiAuth.delete(`/product/${id}`)
+}
+
 export function getProducts():
 Promise<AxiosResponse<ApiResponse<IProduct[]>>> {
   return api.get('/product')

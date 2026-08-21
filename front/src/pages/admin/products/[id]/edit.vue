@@ -16,7 +16,7 @@
       <AppButton
         plain
         native-type="button"
-        :disabled="submitting"
+        :disabled="submitting || deleting"
         @click="goBack"
       >
         返回商品管理
@@ -47,7 +47,7 @@
     >
       <el-form
         label-position="top"
-        :disabled="submitting"
+        :disabled="submitting || deleting"
         @submit.prevent="submit"
       >
         <div class="form-grid">
@@ -240,6 +240,26 @@
                 <li>下架商品不會顯示在公開商城。</li>
               </ul>
             </section>
+
+            <section class="danger-card">
+              <div>
+                <h3>刪除商品</h3>
+                <p>
+                  刪除後商品會從商城與後台移除，且無法復原。
+                </p>
+              </div>
+
+              <AppButton
+                type="danger"
+                plain
+                native-type="button"
+                :loading="deleting"
+                :disabled="submitting || deleting"
+                @click="confirmDelete"
+              >
+                永久刪除商品
+              </AppButton>
+            </section>
           </aside>
         </div>
 
@@ -247,7 +267,7 @@
           <AppButton
             plain
             native-type="button"
-            :disabled="submitting"
+            :disabled="submitting || deleting"
             @click="goBack"
           >
             取消
@@ -257,7 +277,7 @@
             type="primary"
             native-type="submit"
             :loading="submitting"
-            :disabled="submitting"
+            :disabled="submitting || deleting"
           >
             儲存變更
           </AppButton>
@@ -271,10 +291,12 @@
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
+import { ElMessageBox } from 'element-plus'
 import * as yup from 'yup'
 
 import {
   useAdminProductByIdQuery,
+  useDeleteProductMutation,
   useUpdateProductMutation,
 } from '@/queries/products'
 import { useSnackbarStore } from '@/stores/snackbar'
@@ -308,6 +330,9 @@ const {
 
 const updateProductMutation =
   useUpdateProductMutation()
+
+const deleteProductMutation =
+  useDeleteProductMutation()
 
 const fileAgent =
   useTemplateRef<FileAgentInstance>('fileAgent')
@@ -396,6 +421,10 @@ const submitting = computed(
     || updateProductMutation.isLoading.value,
 )
 
+const deleting = computed(
+  () => deleteProductMutation.isLoading.value,
+)
+
 function clearImageError(): void {
   imageError.value = ''
 }
@@ -412,6 +441,40 @@ function formatDate(value: string): string {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(value))
+}
+
+async function confirmDelete(): Promise<void> {
+  if (!product.value || submitting.value || deleting.value) {
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `確定要永久刪除「${product.value.name}」嗎？\n\n刪除後將無法復原。`,
+      '刪除商品',
+      {
+        type: 'warning',
+        confirmButtonText: '永久刪除',
+        cancelButtonText: '取消',
+        distinguishCancelAndClose: true,
+      },
+    )
+  } catch {
+    return
+  }
+
+  try {
+    await deleteProductMutation.mutateAsync(productId())
+
+    snackbar.add({
+      text: '商品刪除成功',
+      color: 'success',
+    })
+
+    await router.push('/admin/products')
+  } catch (deleteError) {
+    snackbar.addError(deleteError)
+  }
 }
 
 const submit = handleSubmit(async values => {
@@ -635,6 +698,33 @@ const submit = handleSubmit(async values => {
     color: var(--el-text-color-secondary);
     font-size: 0.84rem;
     line-height: 1.55;
+  }
+}
+
+
+.danger-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--el-color-danger-light-7);
+  border-radius: 12px;
+  background: var(--el-color-danger-light-9);
+
+  h3 {
+    margin: 0;
+    color: var(--el-color-danger);
+    font-size: 0.95rem;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: var(--el-text-color-secondary);
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  :deep(.app-button) {
+    width: 100%;
   }
 }
 
