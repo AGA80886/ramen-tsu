@@ -233,10 +233,8 @@ const goToSlide = async (nextIndex: number, direction?: 1 | -1) => {
   gsap.killTweensOf([currentElement, nextElement])
 
   gsap.set(nextElement, {
-    autoAlpha: 1,
+    autoAlpha: 0,
     zIndex: 2,
-    xPercent: resolvedDirection * 4,
-    scale: 1.035,
   })
 
   gsap.set(currentElement, {
@@ -252,14 +250,11 @@ const goToSlide = async (nextIndex: number, direction?: 1 | -1) => {
       gsap.set(currentElement, {
         autoAlpha: 0,
         zIndex: 0,
-        xPercent: 0,
-        scale: 1,
       })
 
       gsap.set(nextElement, {
+        autoAlpha: 1,
         zIndex: 1,
-        xPercent: 0,
-        scale: 1,
       })
 
       activeIndex.value = nextIndex
@@ -270,13 +265,11 @@ const goToSlide = async (nextIndex: number, direction?: 1 | -1) => {
   timeline
     .to(currentElement, {
       autoAlpha: 0,
-      xPercent: resolvedDirection * -3,
-      scale: 1.015,
+      duration: 0.8,
     }, 0)
     .to(nextElement, {
       autoAlpha: 1,
-      xPercent: 0,
-      scale: 1,
+      duration: 0.8,
     }, 0)
 }
 

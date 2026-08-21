@@ -239,7 +239,7 @@ export const updateStatus = async (req: Request, res: Response): Promise<void> =
       status: body.status,
     },
     {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     },
   )
