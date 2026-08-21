@@ -20,11 +20,7 @@
         <AppCard class="map-card">
           <div class="map-card__header">
             <div>
-              <h2>拉麵店地圖</h2>
-
-              <p>
-                地圖資料由 Google My Maps 提供。
-              </p>
+              <h4>地圖資料由 Google My Maps 提供。</h4>
             </div>
           </div>
 

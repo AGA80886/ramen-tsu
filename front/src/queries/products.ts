@@ -174,3 +174,25 @@ export const useUpdateProductMutation =
       },
     })
   })
+
+export const useDeleteProductMutation =
+  defineMutation(() => {
+    const queryCache = useQueryCache()
+
+    return useMutation({
+      mutation: (id: string) =>
+        productService.deleteProduct(id),
+
+      onSuccess: async () => {
+        await Promise.all([
+          queryCache.invalidateQueries({
+            key: productKeys.root,
+          }),
+
+          queryCache.invalidateQueries({
+            key: ['cart'],
+          }),
+        ])
+      },
+    })
+  })

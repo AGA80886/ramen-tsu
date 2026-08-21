@@ -188,13 +188,11 @@
                   <span class="cart-item__label">數量</span>
 
                   <el-input-number
+                    class="cart-item__quantity-input"
                     :model-value="item.quantity"
                     :min="1"
                     :max="99"
-                    :disabled="
-                      isMutatingCart
-                        || !item.product.sell
-                    "
+                    :disabled="!item.product.sell"
                     @change="
                       updateQuantity(
                         item.product._id,
@@ -660,6 +658,18 @@ async function goToCheckout(): Promise<void> {
     gap: 8px;
   }
 
+  // 固定 InputNumber 的版面尺寸。
+  // 更新購物車時不再切換 disabled，避免 Element Plus 的
+  // disabled 樣式造成 +/- 控制框在請求期間閃動／抖動。
+  &__quantity {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  &__quantity-input {
+    width: 200px;
+  }
+
   &__label {
     color: var(--color-text-secondary);
     font-size: 13px;
@@ -676,6 +686,16 @@ async function goToCheckout(): Promise<void> {
   &__remove {
     border-radius: 8px;
   }
+}
+
+// Element Plus InputNumber 在 focus / disabled 狀態切換時，
+// 內部控制按鈕尺寸保持固定，避免視覺位移。
+:deep(.cart-item__quantity-input.el-input-number) {
+  box-sizing: border-box;
+}
+
+:deep(.cart-item__quantity-input .el-input__wrapper) {
+  box-sizing: border-box;
 }
 
 .cart-summary {
