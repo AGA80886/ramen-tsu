@@ -348,7 +348,7 @@ async function goToOrders(): Promise<void> {
 }
 
 async function goShopping(): Promise<void> {
-  await router.push('/')
+  await router.push('/online-store')
 }
 </script>
 

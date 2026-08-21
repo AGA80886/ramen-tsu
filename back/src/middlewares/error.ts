@@ -11,8 +11,6 @@ export default async (
   res: Response,
   _next: NextFunction,
 ): Promise<void> => {
-  console.error(error)
-
   // 如果有錯誤，刪除已上傳但尚未成功寫入資料庫的圖片。
   if (req.file?.filename) {
     await cloudinary.uploader.destroy(req.file.filename).catch((cleanupError) => {
@@ -263,6 +261,8 @@ export default async (
         return
 
       default:
+        console.error('Unhandled application error:', error)
+
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,
           message: '伺服器錯誤',
@@ -270,6 +270,8 @@ export default async (
         return
     }
   }
+
+  console.error('Unknown error:', error)
 
   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
     success: false,

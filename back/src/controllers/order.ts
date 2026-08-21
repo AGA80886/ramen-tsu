@@ -114,7 +114,7 @@ export const updateStatus = async (req: Request, res: Response): Promise<void> =
       status: req.body.status,
     },
     {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     },
   )

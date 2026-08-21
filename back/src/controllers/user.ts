@@ -92,8 +92,14 @@ export const updateMe = async (req: Request, res: Response) => {
 
   const { email, nickname } = parsedBody
 
-  if (email !== undefined) {
+  if (email !== undefined && email !== user.email) {
     user.email = email
+    user.emailVerified = false
+    user.emailVerifiedAt = null
+
+    await EmailVerificationToken.deleteMany({
+      user: user._id,
+    })
   }
 
   if (nickname !== undefined) {

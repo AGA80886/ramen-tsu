@@ -20,7 +20,7 @@ export interface IUser {
   createdAt: Date
   updatedAt: Date
   emailVerified: boolean
-  emailVerifiedAt?: Date
+  emailVerifiedAt?: Date | null
 }
 
 // Document = 純資料
