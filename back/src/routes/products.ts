@@ -21,6 +21,8 @@ router.patch(
   controllerProduct.update,
 )
 
+router.delete('/:id', middlewareAuth.jwt, middlewareAuth.admin, controllerProduct.remove)
+
 router.get('/', controllerProduct.get)
 
 router.get('/all', middlewareAuth.jwt, middlewareAuth.admin, controllerProduct.getAll)

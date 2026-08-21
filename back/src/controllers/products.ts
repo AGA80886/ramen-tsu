@@ -4,6 +4,7 @@ import * as yup from 'yup'
 import validator from 'validator'
 import { StatusCodes } from 'http-status-codes'
 import cloudinary from '../configs/cloudinary'
+import User from '../models/user'
 
 type ProductBody = Pick<IProduct, 'name' | 'price' | 'description' | 'category' | 'sell'>
 
@@ -95,6 +96,47 @@ export const update = async (req: Request, res: Response) => {
     success: true,
     message: '',
     result: product,
+  })
+}
+
+export const remove = async (req: Request, res: Response) => {
+  const parsedParams = await paramsSchema.validate(req.params, {
+    stripUnknown: true,
+  })
+
+  const product = await Product.findById(parsedParams.id).orFail(new Error('PRODUCT NOT FOUND'))
+
+  const image = product.image
+
+  // 商品刪除前先清除所有會員購物車中的商品參照，
+  // 避免留下已不存在的 Product ObjectId。
+  await User.updateMany(
+    {
+      'cart.product': product._id,
+    },
+    {
+      $pull: {
+        cart: {
+          product: product._id,
+        },
+      },
+    },
+  )
+
+  await product.deleteOne()
+
+  // 資料庫刪除成功後再清除 Cloudinary 圖片。
+  // 圖片清理失敗只記錄 server log，不讓已刪除商品復原。
+  if (image) {
+    void cloudinary.uploader.destroy(image).catch((error) => {
+      console.error('刪除商品圖片失敗', error)
+    })
+  }
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: '商品刪除成功',
+    result: null,
   })
 }
 
