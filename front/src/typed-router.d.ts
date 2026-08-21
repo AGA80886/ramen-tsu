@@ -45,9 +45,86 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/admin/product': RouteRecordInfo<
-      '/admin/product',
-      '/admin/product',
+    '/admin/articles/': RouteRecordInfo<
+      '/admin/articles/',
+      '/admin/articles',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/orders/': RouteRecordInfo<
+      '/admin/orders/',
+      '/admin/orders',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/products/': RouteRecordInfo<
+      '/admin/products/',
+      '/admin/products',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/products/[id]/edit': RouteRecordInfo<
+      '/admin/products/[id]/edit',
+      '/admin/products/:id/edit',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/admin/products/create': RouteRecordInfo<
+      '/admin/products/create',
+      '/admin/products/create',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/shops/': RouteRecordInfo<
+      '/admin/shops/',
+      '/admin/shops',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/users/': RouteRecordInfo<
+      '/admin/users/',
+      '/admin/users',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/admin/users/[id]': RouteRecordInfo<
+      '/admin/users/[id]',
+      '/admin/users/:id',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/articles/': RouteRecordInfo<
+      '/articles/',
+      '/articles',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/articles/[slug]': RouteRecordInfo<
+      '/articles/[slug]',
+      '/articles/:slug',
+      { slug: ParamValue<true> },
+      { slug: ParamValue<false> },
+      | never
+    >,
+    '/articles/create': RouteRecordInfo<
+      '/articles/create',
+      '/articles/create',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/checkout': RouteRecordInfo<
+      '/checkout',
+      '/checkout',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -66,6 +143,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/forgot-password': RouteRecordInfo<
+      '/forgot-password',
+      '/forgot-password',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/login': RouteRecordInfo<
       '/login',
       '/login',
@@ -73,16 +157,135 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/product/[id]': RouteRecordInfo<
-      '/product/[id]',
-      '/product/:id',
+    '/map/': RouteRecordInfo<
+      '/map/',
+      '/map',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/online-store': RouteRecordInfo<
+      '/online-store',
+      '/online-store',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/products/[id]': RouteRecordInfo<
+      '/products/[id]',
+      '/products/:id',
       { id: ParamValue<true> },
       { id: ParamValue<false> },
+      | never
+    >,
+    '/profile/': RouteRecordInfo<
+      '/profile/',
+      '/profile',
+      Record<never, never>,
+      Record<never, never>,
       | never
     >,
     '/register': RouteRecordInfo<
       '/register',
       '/register',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/reset-password': RouteRecordInfo<
+      '/reset-password',
+      '/reset-password',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/shops/': RouteRecordInfo<
+      '/shops/',
+      '/shops',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/shops/[slug]': RouteRecordInfo<
+      '/shops/[slug]',
+      '/shops/:slug',
+      { slug: ParamValue<true> },
+      { slug: ParamValue<false> },
+      | never
+    >,
+    '/shops/create': RouteRecordInfo<
+      '/shops/create',
+      '/shops/create',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/articles/': RouteRecordInfo<
+      '/user/articles/',
+      '/user/articles',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/articles/[id]/edit': RouteRecordInfo<
+      '/user/articles/[id]/edit',
+      '/user/articles/:id/edit',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/user/cart/': RouteRecordInfo<
+      '/user/cart/',
+      '/user/cart',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/favorite-articles/': RouteRecordInfo<
+      '/user/favorite-articles/',
+      '/user/favorite-articles',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/favorite-shops/': RouteRecordInfo<
+      '/user/favorite-shops/',
+      '/user/favorite-shops',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/orders/': RouteRecordInfo<
+      '/user/orders/',
+      '/user/orders',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/orders/[id]': RouteRecordInfo<
+      '/user/orders/[id]',
+      '/user/orders/:id',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/user/shops/': RouteRecordInfo<
+      '/user/shops/',
+      '/user/shops',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/user/shops/[id]/edit': RouteRecordInfo<
+      '/user/shops/[id]/edit',
+      '/user/shops/:id/edit',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/verify-email': RouteRecordInfo<
+      '/verify-email',
+      '/verify-email',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -116,9 +319,97 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/admin/product.vue': {
+    'src/pages/admin/articles/index.vue': {
       routes:
-        | '/admin/product'
+        | '/admin/articles/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/orders/index.vue': {
+      routes:
+        | '/admin/orders/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/products/index.vue': {
+      routes:
+        | '/admin/products/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/products/[id]/edit.vue': {
+      routes:
+        | '/admin/products/[id]/edit'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/products/create.vue': {
+      routes:
+        | '/admin/products/create'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/shops/index.vue': {
+      routes:
+        | '/admin/shops/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/users/index.vue': {
+      routes:
+        | '/admin/users/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/admin/users/[id].vue': {
+      routes:
+        | '/admin/users/[id]'
+      views:
+        | never
+      pathParamNames:
+        | 'id'
+    }
+    'src/pages/articles/index.vue': {
+      routes:
+        | '/articles/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/articles/[slug].vue': {
+      routes:
+        | '/articles/[slug]'
+      views:
+        | never
+      pathParamNames:
+        | 'slug'
+    }
+    'src/pages/articles/create.vue': {
+      routes:
+        | '/articles/create'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/checkout.vue': {
+      routes:
+        | '/checkout'
       views:
         | never
       pathParamNames:
@@ -140,6 +431,14 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
+    'src/pages/forgot-password.vue': {
+      routes:
+        | '/forgot-password'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
     'src/pages/login.vue': {
       routes:
         | '/login'
@@ -148,17 +447,153 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/product/[id].vue': {
+    'src/pages/map/index.vue': {
       routes:
-        | '/product/[id]'
+        | '/map/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/online-store.vue': {
+      routes:
+        | '/online-store'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/products/[id].vue': {
+      routes:
+        | '/products/[id]'
       views:
         | never
       pathParamNames:
         | 'id'
     }
+    'src/pages/profile/index.vue': {
+      routes:
+        | '/profile/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
     'src/pages/register.vue': {
       routes:
         | '/register'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/reset-password.vue': {
+      routes:
+        | '/reset-password'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/shops/index.vue': {
+      routes:
+        | '/shops/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/shops/[slug].vue': {
+      routes:
+        | '/shops/[slug]'
+      views:
+        | never
+      pathParamNames:
+        | 'slug'
+    }
+    'src/pages/shops/create.vue': {
+      routes:
+        | '/shops/create'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/articles/index.vue': {
+      routes:
+        | '/user/articles/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/articles/[id]/edit.vue': {
+      routes:
+        | '/user/articles/[id]/edit'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/cart/index.vue': {
+      routes:
+        | '/user/cart/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/favorite-articles/index.vue': {
+      routes:
+        | '/user/favorite-articles/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/favorite-shops/index.vue': {
+      routes:
+        | '/user/favorite-shops/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/orders/index.vue': {
+      routes:
+        | '/user/orders/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/orders/[id].vue': {
+      routes:
+        | '/user/orders/[id]'
+      views:
+        | never
+      pathParamNames:
+        | 'id'
+    }
+    'src/pages/user/shops/index.vue': {
+      routes:
+        | '/user/shops/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/user/shops/[id]/edit.vue': {
+      routes:
+        | '/user/shops/[id]/edit'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/verify-email.vue': {
+      routes:
+        | '/verify-email'
       views:
         | never
       pathParamNames:

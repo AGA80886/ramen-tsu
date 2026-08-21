@@ -10,11 +10,17 @@ export interface ICart {
 export interface IUser {
   _id: Types.ObjectId
   account: string
+  email?: string
+  nickname: string
+  avatar: string
+  avatarPublicId?: string
   password: string
   cart: ICart[]
   role: 'user' | 'admin'
   createdAt: Date
   updatedAt: Date
+  emailVerified: boolean
+  emailVerifiedAt?: Date | null
 }
 
 // Document = 純資料
@@ -42,12 +48,44 @@ const schema = new Schema<IUser>(
       minLength: [4, '帳號必需是 4 個字以上'],
       maxLength: [20, '帳號必需是 20 個字以下'],
       validate: {
-        validator: (value) => {
-          return validator.isAlphanumeric(value)
-        },
+        validator: (value) => validator.isAlphanumeric(value),
         message: '帳號只能是英數字',
       },
       unique: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      sparse: true,
+      validate: {
+        validator: (value?: string) => !value || validator.isEmail(value),
+        message: 'Email 格式錯誤',
+      },
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerifiedAt: {
+      type: Date,
+      default: null,
+    },
+    nickname: {
+      type: String,
+      trim: true,
+      maxLength: [30, '暱稱最多 30 個字'],
+      default: '',
+    },
+    avatar: {
+      type: String,
+      default: '',
+    },
+    avatarPublicId: {
+      type: String,
+      default: '',
+      select: false,
     },
     password: {
       type: String,
@@ -56,6 +94,7 @@ const schema = new Schema<IUser>(
     },
     cart: {
       type: [cartSchema],
+      default: [],
     },
     role: {
       type: String,
@@ -81,15 +120,13 @@ schema.pre('save', async function () {
   } else if (this.password.length > 20) {
     message = '密碼最長 20 個字'
   }
-  // 如果密碼格式錯誤，拋出驗證錯誤
-  // 用跟 mongoose 一樣的驗證錯誤格式，方便一起處理
+
   if (message !== '') {
     const error = new MongooseError.ValidationError()
     error.addError('password', new MongooseError.ValidatorError({ message }))
     throw error
   }
 
-  // 驗證成功，加密
   this.password = await bcrypt.hash(this.password, 10)
 })
 

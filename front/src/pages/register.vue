@@ -1,18 +1,56 @@
 <template>
   <div class="auth-page">
     <el-card class="auth-card">
-      <template #header><h1>註冊</h1></template>
-      <el-form label-position="top" :disabled="isSubmitting" @submit.prevent="submit">
-        <el-form-item label="帳號" :error="errors.account">
-          <el-input v-model="account" placeholder="長度 4～20 的英數字" :prefix-icon="User" />
+      <template #header>
+        <h1>註冊會員</h1>
+      </template>
+      <el-form
+        label-position="top"
+        :disabled="isSubmitting"
+        @submit.prevent="submit"
+      >
+        <el-form-item
+          label="帳號"
+          :error="errors.account"
+        >
+          <el-input
+            v-model="account"
+            placeholder="長度 4～20 的英數字"
+            :prefix-icon="User"
+          />
         </el-form-item>
-        <el-form-item label="密碼" :error="errors.password">
-          <el-input v-model="password" placeholder="長度 4～20 字" show-password type="password" :prefix-icon="Lock" />
+        <el-form-item
+          label="密碼"
+          :error="errors.password"
+        >
+          <el-input
+            v-model="password"
+            placeholder="長度 4～20 字"
+            show-password
+            type="password"
+            :prefix-icon="Lock"
+          />
         </el-form-item>
-        <el-form-item label="確認密碼" :error="errors.confirmPassword">
-          <el-input v-model="confirmPassword" placeholder="再次輸入密碼" show-password type="password" :prefix-icon="Lock" />
+        <el-form-item
+          label="確認密碼"
+          :error="errors.confirmPassword"
+        >
+          <el-input
+            v-model="confirmPassword"
+            placeholder="再次輸入密碼"
+            show-password
+            type="password"
+            :prefix-icon="Lock"
+          />
         </el-form-item>
-        <el-button class="submit-button" type="primary" :loading="isSubmitting" native-type="submit">註冊</el-button>
+        <el-button
+          class="submit-button"
+          type="primary"
+          :loading="isSubmitting"
+          native-type="submit"
+        >
+          註冊
+        </el-button>
       </el-form>
     </el-card>
   </div>
@@ -42,7 +80,7 @@ const [confirmPassword] = defineField('confirmPassword')
 const submit = handleSubmit(async values => {
   try {
     await register({ account: values.account, password: values.password })
-    snackbar.add({ text: '註冊成功', color: 'green' })
+    snackbar.add({ text: '註冊成功', color: 'success' })
     await router.push('/login')
   } catch (error) { snackbar.addError(error) }
 })

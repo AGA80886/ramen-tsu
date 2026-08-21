@@ -16,3 +16,17 @@ export interface LoginResponse {
   role: UserRole
   cart: number
 }
+
+export interface ForgotPasswordPayload {
+  email: string
+}
+
+export interface ResetPasswordPayload {
+  token: string
+  password: string
+  confirmPassword: string
+}
+
+export interface ValidateResetPasswordTokenPayload {
+  token: string
+}

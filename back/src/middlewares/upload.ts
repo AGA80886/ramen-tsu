@@ -1,36 +1,51 @@
-import multer from 'multer'
-import cloudinary from '../configs/cloudinary'
-import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import type { Request, Response, NextFunction } from 'express'
+import multer from 'multer'
 
-// 上傳設定
+import { uploadImageBuffer } from '../utils/cloudinaryUpload'
+
 const upload = multer({
-  // 設定儲存位置
-  storage: new CloudinaryStorage({
-    cloudinary,
-  }),
-  // 設定檔案大小，1MB
+  storage: multer.memoryStorage(),
+
   limits: {
     fileSize: 1024 * 1024,
   },
-  // 設定檔案過濾
-  // file = 檔案資訊 https://npmx.dev/package/multer#user-content-file-information
-  // callback(錯誤, 是否允許)
-  fileFilter: (req, file, callback) => {
+
+  fileFilter: (_req, file, callback) => {
     if (['image/png', 'image/jpeg'].includes(file.mimetype)) {
       callback(null, true)
-    } else {
-      callback(null, false)
+      return
     }
+
+    callback(null, false)
   },
 })
 
-export default (req: Request, res: Response, next: NextFunction) => {
-  upload.single('image')(req, res, (error) => {
+export default (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  upload.single('image')(req, res, async (error) => {
     if (error) {
       next(new Error('UPLOAD_FAILED'))
-    } else {
+      return
+    }
+
+    if (!req.file) {
       next()
+      return
+    }
+
+    try {
+      const result = await uploadImageBuffer(req.file.buffer)
+
+      req.file.filename = result.public_id
+      req.file.path = result.secure_url
+
+      next()
+    } catch (uploadError) {
+      console.error('Cloudinary 圖片上傳失敗', uploadError)
+      next(new Error('UPLOAD_FAILED'))
     }
   })
 }

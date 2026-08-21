@@ -2,16 +2,21 @@ import { AxiosError } from 'axios'
 import { ElMessage } from 'element-plus'
 import { defineStore } from 'pinia'
 
+export type SnackbarColor =
+  | 'success'
+  | 'error'
+  | 'warning'
+  | 'info'
 export interface SnackbarMessage {
   text: string
-  color?: 'green' | 'red' | 'warning' | 'info' | string
+  color?: SnackbarColor
 }
 
 export const useSnackbarStore = defineStore('snackbar', () => {
   const add = (message: SnackbarMessage) => {
-    const type = message.color === 'green'
+    const type = message.color === 'success'
       ? 'success'
-      : message.color === 'red'
+      : message.color === 'error'
         ? 'error'
         : message.color === 'warning'
           ? 'warning'

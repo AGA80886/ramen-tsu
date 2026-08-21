@@ -4,43 +4,53 @@ import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import routeAuth from './routes/auth'
-import routeProduct from './routes/product'
+import routeProduct from './routes/products'
 import routeUser from './routes/user'
 import routeOrder from './routes/order'
+import routerArticle from './routes/article'
+import routerArticleComment from './routes/articleComment'
+import routerArticleLike from './routes/articleLike'
+import routerArticleFavorite from './routes/articleFavorite'
+import routerShop from './routes/shop'
+import adminShopRouter from './routes/adminShop'
 import middlewareError from './middlewares/error'
 import './configs/passport'
-
-mongoose
-  .connect(process.env.DB_URL)
-  .then(() => {
-    console.log('資料庫連線成功')
-  })
-  .catch((error) => {
-    console.error(error)
-    console.error('資料庫連線失敗')
-  })
+import './models/shopLike'
+import './models/shopFavorite'
 
 const app = express()
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+
+  ...(process.env.NODE_ENV !== 'production'
+    ? [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+      ]
+    : []),
+
+  'https://aga80886.github.io',
+].filter((origin): origin is string => Boolean(origin))
+
 app.use(
   cors({
-    // origin 請求來源網域
-    // callback(錯誤, 是否允許)
     origin: (origin, callback) => {
-      if (
-        origin &&
-        [
-          'http://localhost:3001',
-          'http://127.0.0.1:3001',
-          'https://rogeraabbccdd.github.io',
-        ].includes(origin)
-      ) {
+      // Postman、curl、伺服器對伺服器請求通常不會帶 Origin。
+      if (!origin) {
         callback(null, true)
-      } else {
-        callback(new Error('CORS'), false)
+        return
       }
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true)
+        return
+      }
+
+      callback(new Error('CORS'))
     },
-    // 允許跨網域請求攜帶 cookie
     credentials: true,
   }),
 )
@@ -52,9 +62,35 @@ app.use('/auth', routeAuth)
 app.use('/product', routeProduct)
 app.use('/user', routeUser)
 app.use('/order', routeOrder)
-
+app.use('/article', routerArticle)
+app.use('/article', routerArticleComment)
+app.use('/article', routerArticleLike)
+app.use('/article', routerArticleFavorite)
+app.use('/shop', routerShop)
+app.use('/admin/shop', adminShopRouter)
 app.use(middlewareError)
 
-app.listen(process.env.PORT || 4000, () => {
-  console.log('伺服器啟動')
-})
+async function startServer(): Promise<void> {
+  const databaseUrl = process.env.DB_URL
+  const port = Number(process.env.PORT) || 4000
+
+  if (!databaseUrl) {
+    console.error('缺少環境變數 DB_URL')
+    process.exit(1)
+  }
+
+  try {
+    await mongoose.connect(databaseUrl)
+    console.log('資料庫連線成功')
+
+    app.listen(port, () => {
+      console.log(`伺服器啟動：http://localhost:${port}`)
+    })
+  } catch (error) {
+    console.error(error)
+    console.error('資料庫連線失敗')
+    process.exit(1)
+  }
+}
+
+void startServer()
