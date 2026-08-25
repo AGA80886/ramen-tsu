@@ -458,12 +458,11 @@ watch(
 .store-grid {
   display: grid;
   grid-template-columns:
-    repeat(
-      3,
-      minmax(0, 1fr)
-    );
+    repeat(3, minmax(0, 1fr));
   gap: 24px;
+  align-items: stretch;
 }
+
 
 .store-state,
 .store-empty {
@@ -551,6 +550,19 @@ watch(
 
   .store-grid {
     grid-template-columns: 1fr;
+
+    :deep(.product-card__body) {
+      min-height: auto;
+    }
+
+    :deep(.product-card__actions) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    :deep(.product-card__actions .btn) {
+      width: 100%;
+    }
   }
 
   .store-pagination {
