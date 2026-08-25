@@ -549,6 +549,51 @@ export const updateShopStatus = async (
   }
 }
 
+/**
+ * DELETE /admin/shop/:id
+ *
+ * Admin 永久刪除店家
+ *
+ * 只有 Admin 可以刪除任意店家，
+ * 與 DELETE /shop/:id 的會員 Owner 權限分開。
+ */
+export const deleteAdminShop = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const id = String(req.params.id ?? '')
+
+    if (!id) {
+      res.status(400).json({
+        success: false,
+        message: '缺少店家 ID',
+      })
+      return
+    }
+
+    const shop = await Shop.findById(id)
+
+    if (!shop) {
+      res.status(404).json({
+        success: false,
+        message: '找不到店家',
+      })
+      return
+    }
+
+    await shop.deleteOne()
+
+    res.status(200).json({
+      success: true,
+      message: '刪除店家成功',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 const isValidShopLocation = (location: unknown): location is IShopLocation => {
   if (typeof location !== 'object' || location === null) {
     return false
