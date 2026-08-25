@@ -117,7 +117,7 @@
         >
           <el-table-column
             label="文章"
-            min-width="260"
+            min-width="220"
           >
             <template #default="{ row }">
               <div class="article-cell">
@@ -137,12 +137,12 @@
           <el-table-column
             label="分類"
             prop="category"
-            min-width="110"
+            min-width="90"
           />
 
           <el-table-column
             label="作者"
-            min-width="140"
+            min-width="110"
           >
             <template #default="{ row }">
               {{ getAuthorName(row) }}
@@ -151,7 +151,7 @@
 
           <el-table-column
             label="狀態"
-            width="100"
+            width="82"
           >
             <template #default="{ row }">
               <el-tag
@@ -165,7 +165,7 @@
 
           <el-table-column
             label="建立時間"
-            min-width="170"
+            min-width="135"
           >
             <template #default="{ row }">
               {{ formatDateTime(row.createdAt) }}
@@ -174,7 +174,7 @@
 
           <el-table-column
             label="更新時間"
-            min-width="170"
+            min-width="135"
           >
             <template #default="{ row }">
               {{ formatDateTime(row.updatedAt) }}
@@ -183,8 +183,7 @@
 
           <el-table-column
             label="操作"
-            width="340"
-            fixed="right"
+            width="220"
           >
             <template #default="{ row }">
               <div class="table-actions">
@@ -949,28 +948,57 @@ function articleStatusType(
 
 .management-table {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.management-table :deep(.el-table__cell) {
+  min-width: 0;
+}
+
+.management-table :deep(.cell) {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .article-cell {
   display: flex;
   min-width: 0;
+  max-width: 100%;
   flex-direction: column;
   gap: 4px;
+  overflow: hidden;
+
+  strong,
+  span,
+  small {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--el-text-color-secondary);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 
   strong {
     color: var(--el-text-color-primary);
-  }
-
-  span,
-  small {
-    overflow: hidden;
-    color: var(--el-text-color-secondary);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   span {
     font-size: 0.8rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  small {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 }
 
@@ -1037,12 +1065,28 @@ function articleStatusType(
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .management-card :deep(.el-card__body) {
-    overflow-x: auto;
+  /*
+   * 不設定固定 min-width，也不讓管理卡片產生水平捲軸。
+   * Element Plus table 會依容器寬度收縮欄位。
+   */
+  .management-card {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .management-table {
-    min-width: 900px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .management-table :deep(.el-table__inner-wrapper),
+  .management-table :deep(.el-table__header-wrapper),
+  .management-table :deep(.el-table__body-wrapper) {
+    max-width: 100%;
+  }
+
+  .table-actions {
+    flex-wrap: wrap;
   }
 }
 
