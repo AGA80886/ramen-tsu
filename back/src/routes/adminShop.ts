@@ -14,4 +14,6 @@ router.patch(
   controllerShop.updateShopStatus,
 )
 
+router.delete('/:id', middlewareAuth.jwt, middlewareAuth.admin, controllerShop.deleteAdminShop)
+
 export default router
