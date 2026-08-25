@@ -116,6 +116,42 @@ export const useAdminShopStore = defineStore(
       }
     }
 
+    const deleteShop = async (id: string) => {
+      loading.value = true
+      error.value = null
+
+      try {
+        const { data } = await apiAuth.delete(
+          `/admin/shop/${id}`,
+        )
+
+        adminShops.value =
+          adminShops.value.filter(
+            shop => shop._id !== id,
+          )
+
+        return data
+      } catch (err) {
+        console.error(
+          'deleteShop error:',
+          err,
+        )
+
+        if (axios.isAxiosError(err)) {
+          error.value =
+            err.response?.data?.message ??
+            '刪除店家失敗'
+        } else {
+          error.value =
+            '刪除店家失敗'
+        }
+
+        throw err
+      } finally {
+        loading.value = false
+      }
+    }
+
     return {
       adminShops,
       pendingShops,
@@ -124,6 +160,7 @@ export const useAdminShopStore = defineStore(
       getAdminShops,
       getPendingShops,
       updateShopStatus,
+      deleteShop,
     }
   },
 )
