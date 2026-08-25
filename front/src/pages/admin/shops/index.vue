@@ -252,6 +252,14 @@
                 >
                   公開頁
                 </AppButton>
+                <AppButton
+                  type="danger"
+                  plain
+                  :loading="deletingId === row._id"
+                  @click="deleteShop(row)"
+                >
+                  刪除
+                </AppButton>
               </div>
             </template>
           </el-table-column>
@@ -380,6 +388,15 @@
           >
             拒絕
           </AppButton>
+          <AppButton
+            v-if="selectedShop"
+            type="danger"
+            plain
+            :loading="deletingId === selectedShop._id"
+            @click="deleteShop(selectedShop)"
+          >
+            刪除店家
+          </AppButton>
         </div>
       </template>
     </el-dialog>
@@ -446,6 +463,9 @@ const statusFilter =
   ref<StatusFilter>('')
 
 const reviewingId =
+  ref<string | null>(null)
+
+const deletingId =
   ref<string | null>(null)
 
 const isReloading = ref(false)
@@ -657,6 +677,54 @@ async function reviewShop(
   }
 }
 
+async function deleteShop(
+  shop: Shop,
+): Promise<void> {
+  if (deletingId.value) {
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `確定要永久刪除「${shop.name}」嗎？刪除後店家資料將無法復原。`,
+      '刪除店家',
+      {
+        confirmButtonText: '永久刪除',
+        cancelButtonText: '取消',
+        type: 'warning',
+        confirmButtonClass: 'el-button--danger',
+      },
+    )
+  } catch {
+    return
+  }
+
+  deletingId.value = shop._id
+
+  try {
+    await adminShopStore.deleteShop(
+      shop._id,
+    )
+
+    if (
+      selectedShop.value?._id ===
+      shop._id
+    ) {
+      selectedShop.value = null
+      detailDialogVisible.value = false
+    }
+
+    snackbar.add({
+      text: `「${shop.name}」已刪除`,
+      color: 'success',
+    })
+  } catch (error) {
+    snackbar.addError(error)
+  } finally {
+    deletingId.value = null
+  }
+}
+
 async function reloadShops():
 Promise<void> {
   if (isReloading.value) {
@@ -802,8 +870,16 @@ onMounted(async () => {
 
     span,
     small {
+      min-width: 0;
       overflow: hidden;
       color: var(--el-text-color-secondary);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    strong {
+      min-width: 0;
+      overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -925,12 +1001,20 @@ onMounted(async () => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .management-card :deep(.el-card__body) {
-    overflow-x: auto;
+  .management-card {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .shop-table {
-    min-width: 920px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .shop-table :deep(.cell) {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .detail-list {
