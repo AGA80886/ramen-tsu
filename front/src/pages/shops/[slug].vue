@@ -642,7 +642,7 @@ onMounted(async () => {
   &__cover-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
   }
 
   &__image-error {
@@ -850,7 +850,7 @@ onMounted(async () => {
   &__image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition:
       transform 0.2s ease;
 
