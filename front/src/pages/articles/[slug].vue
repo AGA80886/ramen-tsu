@@ -161,7 +161,7 @@
                   article.coverImage
               "
               :alt="article.title"
-              fit="cover"
+              fit="contain"
             >
               <template #error>
                 <div
@@ -898,16 +898,16 @@ Promise<void> {
   }
 
   &__cover {
-    overflow: hidden;
-    margin-bottom: 32px;
-    aspect-ratio: 16 / 9;
-    border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
 
-    :deep(.el-image) {
-      width: 100%;
-      height: 100%;
-    }
+  :deep(.el-image) {
+    width: 100%;
+    height: 100%;
   }
+}
 
   &__image-error {
     display: grid;
