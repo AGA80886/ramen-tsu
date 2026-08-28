@@ -161,7 +161,7 @@
                   article.coverImage
               "
               :alt="article.title"
-              fit="cover"
+              fit="contain"
             >
               <template #error>
                 <div
@@ -177,10 +177,29 @@
 
           <!-- Content -->
           <AppCard class="article__body">
-            <div
-              class="article__content"
-            >
-              {{ article.content }}
+            <div class="article__content">
+              <template
+                v-for="(block, index) in articleContentBlocks"
+                :key="`${block.type}-${index}`"
+              >
+                <p
+                  v-if="block.type === 'text'"
+                  class="article__text"
+                >
+                  {{ block.content }}
+                </p>
+
+                <div
+                  v-else
+                  class="article__image"
+                >
+                  <img
+                    :src="block.url"
+                    alt="文章圖片"
+                    loading="lazy"
+                  />
+                </div>
+              </template>
             </div>
           </AppCard>
 
@@ -466,6 +485,54 @@ const isReloading = ref(false)
 const articleId = computed(
   () => article.value?._id ?? '',
 )
+
+type ArticleContentBlock =
+  | {
+      type: 'text'
+      content: string
+    }
+  | {
+      type: 'image'
+      url: string
+    }
+
+const articleContentBlocks = computed<
+  ArticleContentBlock[]
+>(() => {
+  const content =
+    article.value?.content ?? ''
+
+  if (!content) {
+    return []
+  }
+
+  const blocks: ArticleContentBlock[] = []
+
+  const lines = content.split('\n')
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+
+    const isImageUrl =
+  /^https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg)(?:\?[^\s]*)?$/i.test(
+    trimmed,
+  )
+
+  if (isImageUrl) {
+    blocks.push({
+    type: 'image',
+    url: trimmed,
+  })
+  } else {
+      blocks.push({
+        type: 'text',
+        content: line,
+      })
+    }
+  }
+
+  return blocks
+})
 
 const {
   data: likeCount,
@@ -898,16 +965,16 @@ Promise<void> {
   }
 
   &__cover {
-    overflow: hidden;
-    margin-bottom: 32px;
-    aspect-ratio: 16 / 9;
-    border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
 
-    :deep(.el-image) {
-      width: 100%;
-      height: 100%;
-    }
+  :deep(.el-image) {
+    width: 100%;
+    height: 100%;
   }
+}
 
   &__image-error {
     display: grid;
@@ -929,6 +996,27 @@ Promise<void> {
     overflow-wrap: anywhere;
     font-size: 1.05rem;
     line-height: 2;
+  }
+
+  &__text {
+  margin: 0;
+  min-height: 1.5em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  }
+
+  &__image {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+
+  img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    }
   }
 
   &__footer {
